@@ -32,14 +32,14 @@ define(
 
             this.fetchContentDocumentAndResolveDom = function (contentDocumentResolvedCallback, errorCallback) {
                 _publicationFetcher.relativeToPackageFetchFileContents(_contentDocumentPathRelativeToPackage, 'text',
-                    function (contentDocumentText) {
-                        _contentDocumentText = contentDocumentText;
-                        if (_contentDocumentTextPreprocessor) {
-                            _contentDocumentText = _contentDocumentTextPreprocessor(loadedDocumentUri, _contentDocumentText);
-                        }
-                        self.resolveInternalPackageResources(contentDocumentResolvedCallback, errorCallback);
-                    }, errorCallback
-                );
+								       function (contentDocumentText) {
+									   _contentDocumentText = contentDocumentText;
+									   if (_contentDocumentTextPreprocessor) {
+									       _contentDocumentText = _contentDocumentTextPreprocessor(loadedDocumentUri, _contentDocumentText);
+									   }
+									   self.resolveInternalPackageResources(contentDocumentResolvedCallback, errorCallback);
+								       }, errorCallback
+								      );
             };
 
             this.resolveInternalPackageResources = function (resolvedDocumentCallback, onerror) {
@@ -52,7 +52,7 @@ define(
                 if (_publicationFetcher.shouldFetchMediaAssetsProgrammatically()) {
                     
                     console.log("fetchMediaAssetsProgrammatically ...");
-            
+		    
                     resolveDocumentImages(resolutionDeferreds, onerror);
                     
                     resolveDocumentAudios(resolutionDeferreds, onerror);
@@ -100,14 +100,21 @@ define(
             }
 
             function fetchResourceForElement(resolvedElem, refAttrOrigVal, refAttr, fetchMode, resolutionDeferreds,
-                                             onerror, resourceDataPreprocessing) {
+                                             onerror, resourceDataPreprocessing, resultObject) {
 
-                 function replaceRefAttrInElem(newResourceUrl) {
-                     // Store original refAttrVal in a special attribute to provide access to the original href:
-                     //$(resolvedElem).data('epubZipOrigHref', refAttrOrigVal);
-                     $(resolvedElem).attr('data-epubZipOrigHref', refAttrOrigVal);
-                     $(resolvedElem).attr(refAttr, newResourceUrl);
-                 }
+                function replaceRefAttrInElem(newResourceUrl) {
+                    // Store original refAttrVal in a special attribute to provide access to the original href:
+                    //$(resolvedElem).data('epubZipOrigHref', refAttrOrigVal);
+		    if (resultObject) {
+			resultObject.oldUrls.push(refAttrOrigVal);
+			$(resolvedElem).attr('data-epubZipOrigHref', JSON.stringify(resultObject.oldUrls));
+			resultObject.newUrls.push(newResourceUrl);
+			$(resolvedElem).attr(refAttr, JSON.stringify(resultObject.newUrls));
+		    } else {
+			$(resolvedElem).attr('data-epubZipOrigHref', refAttrOrigVal);
+			$(resolvedElem).attr(refAttr, newResourceUrl);
+		    }
+                }
 
                 var refAttrUri = new URI(refAttrOrigVal);
                 if (refAttrUri.scheme() !== '') {
@@ -119,12 +126,12 @@ define(
                     console.log("Absolute path res: " + refAttrOrigVal);
 
                     var HTTPServerRootFolder =
-                    window.location ? (
-                      window.location.protocol
-                      + "//"
-                      + window.location.hostname
-                      + (window.location.port ? (':' + window.location.port) : '')
-                      ) : ''
+			window.location ? (
+			    window.location.protocol
+				+ "//"
+				+ window.location.hostname
+				+ (window.location.port ? (':' + window.location.port) : '')
+			) : ''
                     ;
 
                     replaceRefAttrInElem(HTTPServerRootFolder + refAttrOrigVal);
@@ -146,41 +153,41 @@ define(
                     resolutionDeferreds.push(resolutionDeferred);
 
                     _publicationFetcher.relativeToPackageFetchFileContents(resourceUriRelativeToBase,
-                        fetchMode,
-                        function (resourceData) {
+									   fetchMode,
+									   function (resourceData) {
 
-                            // Generate a function to replace element's resource URL with URL of fetched data.
-                            // The function will either be called directly, immediately (if no preprocessing of resourceData is in effect)
-                            // or indirectly, later after resourceData preprocessing finishes:
-                            var replaceResourceURL = function (finalResourceData) {
-                                // Creating an object URL requires a Blob object, so resource data fetched in text mode needs to be wrapped in a Blob:
-                                if (fetchMode === 'text') {
-                                    var textResourceContentType = ContentTypeDiscovery.identifyContentTypeFromFileName(resourceUriRelativeToBase);
-                                    var declaredType = $(resolvedElem).attr('type');
-                                    if (declaredType) {
-                                        textResourceContentType = declaredType;
-                                    }
-                                    finalResourceData = new Blob([finalResourceData], {type: textResourceContentType});
-                                }
-                                //noinspection JSUnresolvedVariable,JSUnresolvedFunction
-                                var resourceObjectURL = window.URL.createObjectURL(finalResourceData);
-                                _publicationResourcesCache.putResource(resourceUriRelativeToBase,
-                                    resourceObjectURL, finalResourceData);
-                                // TODO: take care of releasing object URLs when no longer needed
-                                replaceRefAttrInElem(resourceObjectURL);
-                                resolutionDeferred.resolve();
-                            };
+									       // Generate a function to replace element's resource URL with URL of fetched data.
+									       // The function will either be called directly, immediately (if no preprocessing of resourceData is in effect)
+									       // or indirectly, later after resourceData preprocessing finishes:
+									       var replaceResourceURL = function (finalResourceData) {
+										   // Creating an object URL requires a Blob object, so resource data fetched in text mode needs to be wrapped in a Blob:
+										   if (fetchMode === 'text') {
+										       var textResourceContentType = ContentTypeDiscovery.identifyContentTypeFromFileName(resourceUriRelativeToBase);
+										       var declaredType = $(resolvedElem).attr('type');
+										       if (declaredType) {
+											   textResourceContentType = declaredType;
+										       }
+										       finalResourceData = new Blob([finalResourceData], {type: textResourceContentType});
+										   }
+										   //noinspection JSUnresolvedVariable,JSUnresolvedFunction
+										   var resourceObjectURL = window.URL.createObjectURL(finalResourceData);
+										   _publicationResourcesCache.putResource(resourceUriRelativeToBase,
+															  resourceObjectURL, finalResourceData);
+										   // TODO: take care of releasing object URLs when no longer needed
+										   replaceRefAttrInElem(resourceObjectURL);
+										   resolutionDeferred.resolve();
+									       };
 
-                            if (resourceDataPreprocessing) {
-                                resourceDataPreprocessing(resourceData, resourceUriRelativeToBase,
-                                    replaceResourceURL);
-                            } else {
-                                replaceResourceURL(resourceData);
-                            }
-                        }, function() {
-                            resolutionDeferred.resolve();
-                            onerror.apply(this, arguments);
-                        });
+									       if (resourceDataPreprocessing) {
+										   resourceDataPreprocessing(resourceData, resourceUriRelativeToBase,
+													     replaceResourceURL);
+									       } else {
+										   replaceResourceURL(resourceData);
+									       }
+									   }, function() {
+									       resolutionDeferred.resolve();
+									       onerror.apply(this, arguments);
+									   });
                 }
             }
 
@@ -230,7 +237,7 @@ define(
                             resourceObjectURL: resourceObjectURL
                         };
                         _publicationResourcesCache.putResource(resourceUriRelativeToBase,
-                            resourceObjectURL, resourceDataBlob);
+							       resourceObjectURL, resourceDataBlob);
                         cssUrlFetchDeferred.resolve();
                     };
                     var fetchErrorCallback = function (error) {
@@ -244,10 +251,10 @@ define(
                         fetchMode = 'text';
                         fetchCallback = function (styleSheetResourceData) {
                             preprocessCssStyleSheetData(styleSheetResourceData, resourceUriRelativeToBase,
-                                function (preprocessedStyleSheetData) {
-                                    var resourceDataBlob = new Blob([preprocessedStyleSheetData], {type: 'text/css'});
-                                    processedBlobCallback(resourceDataBlob);
-                                })
+							function (preprocessedStyleSheetData) {
+							    var resourceDataBlob = new Blob([preprocessedStyleSheetData], {type: 'text/css'});
+							    processedBlobCallback(resourceDataBlob);
+							})
                         }
                     } else {
                         fetchMode = 'blob';
@@ -255,8 +262,8 @@ define(
                     }
 
                     _publicationFetcher.relativeToPackageFetchFileContents(resourceUriRelativeToBase,
-                        fetchMode,
-                        fetchCallback, fetchErrorCallback);
+									   fetchMode,
+									   fetchCallback, fetchErrorCallback);
                 }
             }
 
@@ -281,7 +288,7 @@ define(
                             isStyleSheetResource = true;
                         }
                         fetchResourceForCssUrlMatch(cssUrlMatch, cssResourceDownloadDeferreds,
-                            styleSheetUriRelativeToPackageDocument, stylesheetCssResourceUrlsMap, isStyleSheetResource);
+						    styleSheetUriRelativeToPackageDocument, stylesheetCssResourceUrlsMap, isStyleSheetResource);
                         cssUrlMatch = processingRegexp.exec(styleSheetResourceData);
                     }
 
@@ -300,7 +307,7 @@ define(
                                 processedUrlString = "url('" + processedResourceDescriptor.resourceObjectURL + "')";
                             }
                             var origMatchedUrlStringEscaped = origMatchedUrlString.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g,
-                                "\\$&");
+											   "\\$&");
                             var origMatchedUrlStringRegExp = new RegExp(origMatchedUrlStringEscaped, 'g');
                             //noinspection JSCheckFunctionSignatures
                             styleSheetResourceData =
@@ -323,51 +330,64 @@ define(
                 resolvedElems.each(function (index, resolvedElem) {
                     var refAttrOrigVal = $(resolvedElem).attr(refAttr);
 
-                    fetchResourceForElement(resolvedElem, refAttrOrigVal, refAttr, fetchMode, resolutionDeferreds,
-                        onerror, resourceDataPreprocessing);
-                });
+		    refAttrOrigVal = $(resolvedElem).attr(refAttr);
+
+		    if (refAttrOrigVal.startsWith("[")) {
+			refAttrOrigVal = JSON.parse(refAttrOrigVal);
+			var result = { oldUrls:[], newUrls:[] }
+			
+			refAttrOrigVal.forEach(function (refAttrOrigVal){
+			    fetchResourceForElement(resolvedElem, refAttrOrigVal, refAttr, fetchMode, resolutionDeferreds,
+						    onerror, resourceDataPreprocessing, result);
+			})
+		    }
+		    else {
+			fetchResourceForElement(resolvedElem, refAttrOrigVal, refAttr, fetchMode, resolutionDeferreds,
+						onerror, resourceDataPreprocessing);
+		    }
+		});
             }
 
             function resolveDocumentImages(resolutionDeferreds, onerror) {
-                resolveResourceElements('img', 'src', 'blob', resolutionDeferreds, onerror);
-                resolveResourceElements('image', 'xlink:href', 'blob', resolutionDeferreds, onerror);
+		resolveResourceElements('img', 'src', 'blob', resolutionDeferreds, onerror);
+		resolveResourceElements('image', 'xlink:href', 'blob', resolutionDeferreds, onerror);
             }
 
             function resolveDocumentAudios(resolutionDeferreds, onerror) {
-                resolveResourceElements('audio', 'src', 'blob', resolutionDeferreds, onerror);
+		resolveResourceElements('audio', 'src', 'blob', resolutionDeferreds, onerror);
             }
 
             function resolveDocumentVideos(resolutionDeferreds, onerror) {
-                resolveResourceElements('video', 'src', 'blob', resolutionDeferreds, onerror);
-                resolveResourceElements('video', 'poster', 'blob', resolutionDeferreds, onerror);
+		resolveResourceElements('video', 'src', 'blob', resolutionDeferreds, onerror);
+		resolveResourceElements('video', 'poster', 'blob', resolutionDeferreds, onerror);
             }
 
             function resolveDocumentScripts(resolutionDeferreds, onerror) {
-                resolveResourceElements('script', 'src', 'blob', resolutionDeferreds, onerror);
+		resolveResourceElements('script', 'src', 'blob', resolutionDeferreds, onerror);
             }
 
             function resolveDocumentLinkStylesheets(resolutionDeferreds, onerror) {
-                resolveResourceElements('link', 'href', 'text', resolutionDeferreds, onerror,
-                    preprocessCssStyleSheetData);
+		resolveResourceElements('link', 'href', 'text', resolutionDeferreds, onerror,
+					preprocessCssStyleSheetData);
             }
 
             function resolveDocumentEmbeddedStylesheets(resolutionDeferreds, onerror) {
-                var resolvedElems = $('style', _contentDocumentDom);
-                resolvedElems.each(function (index, resolvedElem) {
+		var resolvedElems = $('style', _contentDocumentDom);
+		resolvedElems.each(function (index, resolvedElem) {
                     var resolutionDeferred = $.Deferred();
                     resolutionDeferreds.push(resolutionDeferred);
                     var styleSheetData = $(resolvedElem).text();
                     preprocessCssStyleSheetData(styleSheetData, _contentDocumentPathRelativeToPackage,
-                        function (resolvedStylesheetData) {
-                            $(resolvedElem).text(resolvedStylesheetData);
-                            resolutionDeferred.resolve();
-                        });
-                });
+						function (resolvedStylesheetData) {
+						    $(resolvedElem).text(resolvedStylesheetData);
+						    resolutionDeferred.resolve();
+						});
+		});
             }
 
-        };
+	};
 
-        return ContentDocumentFetcher;
+	return ContentDocumentFetcher;
 
     }
 );
