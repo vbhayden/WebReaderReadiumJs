@@ -351,6 +351,7 @@ define(
             function resolveDocumentImages(resolutionDeferreds, onerror) {
 		resolveResourceElements('img', 'src', 'blob', resolutionDeferreds, onerror);
 		resolveResourceElements('i', 'data-img', 'blob', resolutionDeferreds, onerror);
+		resolveResourceElements('a', 'data-img', 'blob', resolutionDeferreds, onerror);
 		resolveResourceElements('image', 'xlink:href', 'blob', resolutionDeferreds, onerror);
             }
 
