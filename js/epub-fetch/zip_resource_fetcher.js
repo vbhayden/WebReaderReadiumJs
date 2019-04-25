@@ -70,7 +70,7 @@ define(['jquery', 'URIjs', './discover_content_type', 'zip-ext', 'readium_shared
                         
                     _zipFs.importHttpContent(
                         ebookURL,
-                        true,
+                        false,
                         function () {
                             callback(_zipFs, onerror);
                         },
