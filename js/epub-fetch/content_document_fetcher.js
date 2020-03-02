@@ -114,20 +114,26 @@ define(
             }
 
             function fetchResourceForElement(resolvedElem, refAttrOrigVal, refAttr, fetchMode, resolutionDeferreds,
-                                             onerror, resourceDataPreprocessing, resultObject) {
+                                             onerror, resourceDataPreprocessing, resultObject, index) {
 
                 function replaceRefAttrInElem(newResourceUrl) {
                     // Store original refAttrVal in a special attribute to provide access to the original href:
                     //$(resolvedElem).data('epubZipOrigHref', refAttrOrigVal);
-		    if (resultObject) {
-			resultObject.oldUrls.push(refAttrOrigVal);
-			$(resolvedElem).attr('data-epubZipOrigHref', JSON.stringify(resultObject.oldUrls));
-			resultObject.newUrls.push(newResourceUrl);
-			$(resolvedElem).attr(refAttr, JSON.stringify(resultObject.newUrls));
-		    } else {
-			$(resolvedElem).attr('data-epubZipOrigHref', refAttrOrigVal);
-			$(resolvedElem).attr(refAttr, newResourceUrl);
-		    }
+        		    if (resultObject) {
+                        if (index)
+                            resultObject.oldUrls[index] = refAttrOrigVal;
+                        else
+        			        resultObject.oldUrls.push(refAttrOrigVal);
+        			    $(resolvedElem).attr('data-epubZipOrigHref', JSON.stringify(resultObject.oldUrls));
+                        if (index)
+                            resultObject.newUrls[index] = newResourceUrl;
+                        else
+        			        resultObject.newUrls.push(newResourceUrl);
+        			    $(resolvedElem).attr(refAttr, JSON.stringify(resultObject.newUrls));
+        		    } else {
+        			    $(resolvedElem).attr('data-epubZipOrigHref', refAttrOrigVal);
+        			    $(resolvedElem).attr(refAttr, newResourceUrl);
+        		    }
                 }
 
                 var refAttrUri = new URI(refAttrOrigVal);
@@ -344,22 +350,21 @@ define(
                 resolvedElems.each(function (index, resolvedElem) {
                     var refAttrOrigVal = $(resolvedElem).attr(refAttr);
 
-		    refAttrOrigVal = $(resolvedElem).attr(refAttr);
+        		    refAttrOrigVal = $(resolvedElem).attr(refAttr);
 
-		    if (refAttrOrigVal.startsWith("[")) {
-			refAttrOrigVal = JSON.parse(refAttrOrigVal);
-			var result = { oldUrls:[], newUrls:[] }
-			
-			refAttrOrigVal.forEach(function (refAttrOrigVal){
-			    fetchResourceForElement(resolvedElem, refAttrOrigVal, refAttr, fetchMode, resolutionDeferreds,
-						    onerror, resourceDataPreprocessing, result);
-			})
-		    }
-		    else {
-			fetchResourceForElement(resolvedElem, refAttrOrigVal, refAttr, fetchMode, resolutionDeferreds,
-						onerror, resourceDataPreprocessing);
-		    }
-		});
+        		    if (refAttrOrigVal.startsWith("[")) {
+        			    refAttrOrigVal = JSON.parse(refAttrOrigVal);
+        			    var result = { oldUrls:Array(refAttrOrigVal.length).fill(''), newUrls:Array(refAttrOrigVal.length).fill('') }
+        			
+        			    refAttrOrigVal.forEach(function (refAttrOrigVal, imageIndex){
+        			        fetchResourceForElement(resolvedElem, refAttrOrigVal, refAttr, fetchMode, resolutionDeferreds,
+        						    onerror, resourceDataPreprocessing, result, imageIndex);
+        			    })
+        		    } else {
+            			fetchResourceForElement(resolvedElem, refAttrOrigVal, refAttr, fetchMode, resolutionDeferreds,
+            						onerror, resourceDataPreprocessing);
+            		}
+        		});
             }
 
             function resolveDocumentImages(resolutionDeferreds, onerror) {
