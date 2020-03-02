@@ -120,12 +120,12 @@ define(
                     // Store original refAttrVal in a special attribute to provide access to the original href:
                     //$(resolvedElem).data('epubZipOrigHref', refAttrOrigVal);
         		    if (resultObject) {
-                        if (index)
+                        if (index !== undefined)
                             resultObject.oldUrls[index] = refAttrOrigVal;
                         else
         			        resultObject.oldUrls.push(refAttrOrigVal);
         			    $(resolvedElem).attr('data-epubZipOrigHref', JSON.stringify(resultObject.oldUrls));
-                        if (index)
+                        if (index !== undefined)
                             resultObject.newUrls[index] = newResourceUrl;
                         else
         			        resultObject.newUrls.push(newResourceUrl);
