@@ -190,6 +190,13 @@ define(['jquery', 'URIjs', './markup_parser', './plain_resource_fetcher', './zip
             contentDocumentFetcher.fetchContentDocumentAndResolveDom(contentDocumentResolvedCallback, errorCallback);
         };
 
+        this.fetchContentDocumentWithoutResolvingDom = function (attachedData, loadedDocumentUri, contentDocumentResolvedCallback, errorCallback) {
+            _publicationResourcesCache.unPinResources();
+
+            var contentDocumentFetcher = new ContentDocumentFetcher(self, attachedData.spineItem, loadedDocumentUri, _publicationResourcesCache, _contentDocumentTextPreprocessor);
+            contentDocumentFetcher.fetchContentDocumentWithoutResolvingDom(contentDocumentResolvedCallback, errorCallback);
+        }
+
         this.getFileContentsFromPackage = function(filePathRelativeToPackageRoot, callback, onerror) {
             
             // AVOID INVOKING fetchFileContentsText() directly, use relativeToPackageFetchFileContents() wrapper instead so that additional checks are performed.

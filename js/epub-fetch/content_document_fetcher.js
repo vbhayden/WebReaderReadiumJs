@@ -56,6 +56,26 @@ define(
 								      );
             };
 
+            this.fetchContentDocumentWithoutResolvingDom = function (contentDocumentResolvedCallback, errorCallback) {
+                _publicationFetcher.relativeToPackageFetchFileContents(_contentDocumentPathRelativeToPackage, 'text',
+                                       function (contentDocumentText) {
+                                       _contentDocumentText = contentDocumentText;
+                                       if (_contentDocumentTextPreprocessor) {
+                                           _contentDocumentText = _contentDocumentTextPreprocessor(loadedDocumentUri, _contentDocumentText);
+                                       }
+
+                                       try {
+                                           var parser = new DOMParser();
+                                           var doc = parser.parseFromString(_contentDocumentText, 'application/xhtml+xml');
+                                           contentDocumentResolvedCallback(doc);
+                                       } catch (e) {
+                                           errorCallback(e);
+                                       }
+
+                                       }, errorCallback
+                                      );
+            }
+
             this.resolveInternalPackageResources = function (resolvedDocumentCallback, onerror) {
 
                 _contentDocumentDom = _publicationFetcher.markupParser.parseMarkup(_contentDocumentText, _srcMediaType);
