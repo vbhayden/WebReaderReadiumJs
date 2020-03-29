@@ -147,7 +147,6 @@ define(['readium_shared_js/globals', 'text!version.json', 'jquery', 'underscore'
             });
         };
 
-
         this.openPackageDocument = function(ebookURL, callback, openPageRequest)  {
                         
             if (!(ebookURL instanceof Blob)
@@ -234,6 +233,122 @@ define(['readium_shared_js/globals', 'text!version.json', 'jquery', 'underscore'
             }
                     
             openPackageDocument_(ebookURL, callback, openPageRequest);
+        };
+
+        getPackageDocument_ = function(ebookURL, callback, contentType) {
+            if (_currentPublicationFetcher) {
+                _currentPublicationFetcher.flushCache();
+            }
+
+            var cacheSizeEvictThreshold = null;
+            if (readiumOptions.cacheSizeEvictThreshold) {
+                cacheSizeEvictThreshold = readiumOptions.cacheSizeEvictThreshold;
+            }
+
+            _currentPublicationFetcher = new PublicationFetcher(ebookURL, jsLibRoot, window, cacheSizeEvictThreshold, _contentDocumentTextPreprocessor, contentType);
+
+            _currentPublicationFetcher.initialize(function(resourceFetcher) {
+
+                if (!resourceFetcher) {
+                    
+                    callback(undefined);
+                    return;
+                }
+                
+                var _packageParser = new PackageParser(_currentPublicationFetcher);
+
+                _packageParser.parse(function(packageDocument){
+                    
+                    if (!packageDocument) {
+                        
+                        callback(undefined);
+                        return;
+                    }
+                    
+                    var openBookOptions = readiumOptions.openBookOptions || {};
+                    var openBookData = $.extend(packageDocument.getSharedJsPackageData(), openBookOptions);
+
+                    
+
+                    var options = {
+                        metadata: packageDocument.getMetadata()
+                    };
+
+                    callback(packageDocument, options);
+                });
+            });
+        }
+
+        this.getPackageDocument = function(ebookURL, callback) {
+            if (!(ebookURL instanceof Blob)
+                && !(ebookURL instanceof File)
+            ) {
+                var origin = window.location.origin; 
+                if (!origin) {
+                    origin = window.location.protocol + '//' + window.location.host;
+                }
+                var thisRootUrl = origin + window.location.pathname;
+
+                try {
+                    ebookURL = new URI(ebookURL).absoluteTo(thisRootUrl).toString();
+                } catch(err) {
+                    console.error(err);
+                    console.log(ebookURL);
+                }
+
+                 // We don't use URI.is("absolute") here, as we really need HTTP(S) (excludes e.g. "data:" URLs)
+                if (ebookURL.indexOf("http://") == 0 || ebookURL.indexOf("https://") == 0) {
+                        
+                    var xhr = new XMLHttpRequest();
+                    xhr.onreadystatechange = function(){
+                        
+                        if (this.readyState != 4) return;
+                        
+                        var contentType = undefined;
+                        
+                        var success = xhr.status >= 200 && xhr.status < 300 || xhr.status === 304;
+                        if (success) {
+                            
+                            var allResponseHeaders = '';
+                            if (xhr.getAllResponseHeaders) {
+                                allResponseHeaders = xhr.getAllResponseHeaders();
+                                if (allResponseHeaders) {
+                                    allResponseHeaders = allResponseHeaders.toLowerCase();
+                                } else allResponseHeaders ='';
+                                //console.debug(allResponseHeaders);
+                            }
+                            
+                            if (allResponseHeaders.indexOf("content-type") >= 0) {
+                                contentType = xhr.getResponseHeader("Content-Type") || xhr.getResponseHeader("content-type");
+                                if (!contentType) contentType = undefined;
+                                
+                                console.debug("CONTENT-TYPE: " + ebookURL + " ==> " + contentType);
+                            }
+                            
+                            var responseURL = xhr.responseURL;
+                            if (!responseURL) {
+                                if (allResponseHeaders.indexOf("location") >= 0) {
+                                    responseURL = xhr.getResponseHeader("Location") || xhr.getResponseHeader("location");
+                                }
+                            }
+                            
+                            if (responseURL && responseURL !== ebookURL) {
+                                console.debug("REDIRECT: " + ebookURL + " ==> " + responseURL);
+    
+                                ebookURL = responseURL;
+                            }
+                        }
+                        
+                        getPackageDocument_(ebookURL, callback, contentType);
+                    };
+                    xhr.open('HEAD', ebookURL, true);
+                    //xhr.responseType = 'blob';
+                    xhr.send(null); 
+                
+                    return;
+                }
+                getPackageDocument_(ebookURL, callback);
+            }
         };
         
         this.closePackageDocument = function() {
