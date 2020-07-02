@@ -99,7 +99,7 @@ dependencies:
     "opener": '^1.4.3'
 
     #"http-server": 'latest'
-    "http-server": 'github:danielweck/http-server#master'
+    #    "http-server": 'github:danielweck/http-server#master'
     # SEE: https://github.com/indexzero/http-server/issues/154
 
     "bowser": '^1.9.3'
@@ -422,64 +422,3 @@ scripts:
             readium-shared-js/static/sdk.css
             build-output/css/
     '
-
-#=====================
-#### BLOCKING! (CTRL-C) [watch][live-reload][http]
-    'http:watch': '
-
-        echo > open_webbrowser.js
-        &&
-        run-p
-            \"dowatch\"
-            \"httpServe\"
-    '
-#    \"live-reload\"
-
-#=====================
-#### BLOCKING! (CTRL-C) [http]
-    'http': '
-        npm run genPluginsConfig
-        &&
-        npm run httpServe
-    '
-
-#=====================
-#### BLOCKING! (CTRL-C) [watch or nodemon]
-    'dowatch': '
-
-        npm run watch
-            \"npm run build
-                && node readium-shared-js/readium-build-tools/webbrowser.js
-                && npm run rimraf
-                    open_webbrowser.js\"
-            dev/ js/ readium-shared-js/js/ readium-shared-js/plugins/ readium-shared-js/js/
-    '
-    #    nodemon -q
-    #    -w dev/
-    #    --ext \".\"
-    #    --exec \" ... \"
-
-#=====================
-    'httpServe': '
-
-        node
-            readium-shared-js/readium-build-tools/http-server.js
-            
-            -LOGFILE
-            http.log
-            
-            -OPEN
-            /dev/
-            
-            -c-1
-            -a 127.0.0.1
-            -p 9090
-            --cors
-            .
-    '
-
-#=====================
-#    'live-reload': '
-#
-#        live-reload --port 9091 --delay 1000 build-output/
-#    '
