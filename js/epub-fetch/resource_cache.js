@@ -67,7 +67,7 @@ define(['underscore'], function (_) {
                         var downshiftedEntry = _orderingByLastUseTimestamp[i];
                         // Assertion
                         if ((downshiftedEntry.orderingByLastUseTimestampIdx - 1) != i) {
-                            console.error('algorithm incorrect: downshiftedEntry.orderingByLastUseTimestampIdx: ' +
+                            consoleError('algorithm incorrect: downshiftedEntry.orderingByLastUseTimestampIdx: ' +
                                 downshiftedEntry.orderingByLastUseTimestampIdx + ', i: ' + i + " -- " + cacheEntry.absoluteHref);
                         }
                         downshiftedEntry.orderingByLastUseTimestampIdx = i;
@@ -117,15 +117,15 @@ define(['underscore'], function (_) {
                 }
                 // Assertion
                 if (_cacheSize != 0) {
-                    console.error('cacheSize accounting error! cacheSize: ' + _cacheSize + ', _resourcesHash:');
-                    console.error(_resourcesHash);
+                    consoleError('cacheSize accounting error! cacheSize: ' + _cacheSize + ', _resourcesHash:');
+                    consoleError(_resourcesHash);
                 }
                 _orderingByLastUseTimestamp = [];
-                //console.log('Cache contents:');
-                //console.log(_resourcesHash);
-                //console.log('_orderingByLastUseTimestamp:');
-                //console.log(_orderingByLastUseTimestamp);
-                //console.log('Cache size:' + _cacheSize);
+                //consoleLog('Cache contents:');
+                //consoleLog(_resourcesHash);
+                //consoleLog('_orderingByLastUseTimestamp:');
+                //consoleLog(_orderingByLastUseTimestamp);
+                //consoleLog('Cache size:' + _cacheSize);
             };
 
             this.unPinResources = function() {
@@ -147,7 +147,7 @@ define(['underscore'], function (_) {
                 if (_cacheSize < cacheSizeEvictThreshold) {
                     return;
                 }
-                console.log('Trimming cache. Current cache size: ' + _cacheSize);
+                consoleLog('Trimming cache. Current cache size: ' + _cacheSize);
 
                 // Loop through ordered index (by last use timestamp) starting from the least recently used entries.
                 // evict unpinned resources until either:
@@ -160,15 +160,15 @@ define(['underscore'], function (_) {
                     var cacheEntry = _orderingByLastUseTimestamp[i];
                     if (!cacheEntry.pinned) {
                         var resourceAbsoluteHref = cacheEntry.absoluteHref;
-                        //console.log('Preparing to evict ' + resourceAbsoluteHref);
-                        //console.log('_orderingByLastUseTimestamp:');
-                        //console.log(orderingByLastUseTimestampToString());
+                        //consoleLog('Preparing to evict ' + resourceAbsoluteHref);
+                        //consoleLog('_orderingByLastUseTimestamp:');
+                        //consoleLog(orderingByLastUseTimestampToString());
                         this.evictResource(resourceAbsoluteHref);
-                        //console.log('Evicted ' + resourceAbsoluteHref);
-                        //console.log('Current cache size: ' + _cacheSize);
-                        //console.log('_orderingByLastUseTimestamp:');
-                        //console.log(orderingByLastUseTimestampToString());
-                        //console.log('i: ' + i);
+                        //consoleLog('Evicted ' + resourceAbsoluteHref);
+                        //consoleLog('Current cache size: ' + _cacheSize);
+                        //consoleLog('_orderingByLastUseTimestamp:');
+                        //consoleLog(orderingByLastUseTimestampToString());
+                        //consoleLog('i: ' + i);
 
                         // The consequent array elements have downshifted by one position.
                         // The i variable now points to a different element - the evicted element's successor
@@ -177,7 +177,7 @@ define(['underscore'], function (_) {
                         i--;
                     }
                 }
-                console.log('Cache size after trimming: ' + _cacheSize);
+                consoleLog('Cache size after trimming: ' + _cacheSize);
             };
         };
 

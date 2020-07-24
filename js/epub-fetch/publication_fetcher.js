@@ -60,7 +60,7 @@ define(['jquery', 'URIjs', './markup_parser', './plain_resource_fetcher', './zip
 
             // Non exploded EPUBs (i.e. zipped .epub documents) should be fetched in a programmatical manner:
             _shouldConstructDomProgrammatically = !isEpubExploded;
-            console.log("_shouldConstructDomProgrammatically INIT: " + _shouldConstructDomProgrammatically);
+            consoleLog("_shouldConstructDomProgrammatically INIT: " + _shouldConstructDomProgrammatically);
             
             createResourceFetcher(isEpubExploded, function(resourceFetcher) {
     
@@ -68,7 +68,7 @@ define(['jquery', 'URIjs', './markup_parser', './plain_resource_fetcher', './zip
                 
                 self.getPackageDom(
                     function() {callback(resourceFetcher);},
-                    function(error) {console.error("unable to find package document: " + error); callback(undefined);}
+                    function(error) {consoleError("unable to find package document: " + error); callback(undefined);}
                 );
             });
         };
@@ -97,8 +97,8 @@ define(['jquery', 'URIjs', './markup_parser', './plain_resource_fetcher', './zip
                 //.absoluteTo("http://readium.org/epub")
                 uriTrimmed = new URI(uriTrimmed).search('').hash('').toString();
             } catch(err) {
-                console.error(err);
-                console.log(ebookURL);
+                consoleError(err);
+                consoleLog(ebookURL);
             }
             
             // dumb test: ends with ".epub" file extension
@@ -110,11 +110,11 @@ define(['jquery', 'URIjs', './markup_parser', './plain_resource_fetcher', './zip
 
         function createResourceFetcher(isExploded, callback) {
             if (isExploded) {
-                console.log(' --- using PlainResourceFetcher');
+                consoleLog(' --- using PlainResourceFetcher');
                 _resourceFetcher = new PlainResourceFetcher(self);
                 callback(_resourceFetcher);
             } else {
-                console.log(' --- using ZipResourceFetcher');
+                consoleLog(' --- using ZipResourceFetcher');
                 _resourceFetcher = new ZipResourceFetcher(self, jsLibRoot);
                 callback(_resourceFetcher);
             }
@@ -203,7 +203,7 @@ define(['jquery', 'URIjs', './markup_parser', './plain_resource_fetcher', './zip
             
             // META-INF/container.xml initial fetch, see this.initialize()
             if (!_packageFullPath) {
-                console.debug("FETCHING (INIT) ... " + filePathRelativeToPackageRoot);
+                consoleLog("FETCHING (INIT) ... " + filePathRelativeToPackageRoot);
                 if (filePathRelativeToPackageRoot && filePathRelativeToPackageRoot.charAt(0) == '/') {
                     filePathRelativeToPackageRoot = filePathRelativeToPackageRoot.substr(1);
                 }
@@ -256,9 +256,9 @@ define(['jquery', 'URIjs', './markup_parser', './plain_resource_fetcher', './zip
                         _packageFullPath = packageFullPath;
                         _packageDocumentAbsoluteUrl = _resourceFetcher.resolveURI(_packageFullPath);
                         
-                        console.debug("PACKAGE: ");
-                        console.log(_packageFullPath);
-                        console.log(_packageDocumentAbsoluteUrl);
+                        consoleLog("PACKAGE: ");
+                        consoleLog(_packageFullPath);
+                        consoleLog(_packageDocumentAbsoluteUrl);
                         
                         if (packageFullPath && packageFullPath.charAt(0) != '/') {
                             packageFullPath = '/' + packageFullPath;
@@ -289,7 +289,7 @@ define(['jquery', 'URIjs', './markup_parser', './plain_resource_fetcher', './zip
 
             var pathRelativeToEpubRoot = decodeURIComponent(self.convertPathRelativeToPackageToRelativeToBase(relativeToPackagePath));
 
-            console.debug("FETCHING ... " + pathRelativeToEpubRoot);
+            consoleLog("FETCHING ... " + pathRelativeToEpubRoot);
 
             // In case we received an absolute path, convert it to relative form or the fetch will fail:
             if (pathRelativeToEpubRoot.charAt(0) === '/') {
@@ -311,17 +311,17 @@ define(['jquery', 'URIjs', './markup_parser', './plain_resource_fetcher', './zip
                 var optionalFetch = (pathRelativeToEpubRoot.indexOf("META-INF/com.apple.ibooks.display-options.xml") == 0)
                 || (pathRelativeToEpubRoot.indexOf("META-INF/encryption.xml") == 0);
                     
-                console.log("MISSING: " + pathRelativeToEpubRoot);
+                consoleLog("MISSING: " + pathRelativeToEpubRoot);
                     
                 if (!optionalFetch) {
                     if (err) {
-                        console.error(err);
+                        consoleError(err);
                         
                         if (err.message) {
-                            console.debug(err.message);
+                            consoleLog(err.message);
                         }
                         if (err.stack) {
-                            console.log(err.stack);
+                            consoleLog(err.stack);
                         }
                     }
                 }
@@ -336,7 +336,7 @@ define(['jquery', 'URIjs', './markup_parser', './plain_resource_fetcher', './zip
                 &&
                 new URI(relativeToPackagePath).scheme() !== '') {
 
-                console.log("shouldConstructDomProgrammatically EXTERNAL RESOURCE ...");
+                consoleLog("shouldConstructDomProgrammatically EXTERNAL RESOURCE ...");
 
                   if (fetchMode === 'blob') {
 
@@ -355,7 +355,7 @@ define(['jquery', 'URIjs', './markup_parser', './plain_resource_fetcher', './zip
                       xhr.send();
 
                   } else if (fetchMode === 'data64uri') {
-                      console.error("data64uri??");
+                      consoleError("data64uri??");
                   } else {
 
                       $.ajax({
@@ -384,7 +384,7 @@ define(['jquery', 'URIjs', './markup_parser', './plain_resource_fetcher', './zip
             if (fetchMode === 'blob') {
                 fetchFunction = _resourceFetcher.fetchFileContentsBlob;
             } else if (fetchMode === 'data64uri') {
-                console.error("data64uri??");
+                consoleError("data64uri??");
                 fetchFunction = _resourceFetcher.fetchFileContentsData64Uri;
             }
 
@@ -421,7 +421,7 @@ define(['jquery', 'URIjs', './markup_parser', './plain_resource_fetcher', './zip
                         var cipherReference = $('CipherReference', encryptedData);
                         cipherReference.each(function (index, CipherReference) {
                             var cipherReferenceURI = $(CipherReference).attr('URI');
-                            console.log('Encryption/obfuscation algorithm ' + encryptionAlgorithm + ' specified for ' +
+                            consoleLog('Encryption/obfuscation algorithm ' + encryptionAlgorithm + ' specified for ' +
                                 cipherReferenceURI);
                             encryptions[cipherReferenceURI] = encryptionAlgorithm;
                         });
@@ -443,7 +443,7 @@ define(['jquery', 'URIjs', './markup_parser', './plain_resource_fetcher', './zip
                 if (_encryptionHandler.isEncryptionSpecified()) {
                     // EPUBs that use encryption for any resources should be fetched in a programmatical manner:
                     _shouldConstructDomProgrammatically = true;
-                    console.log("_shouldConstructDomProgrammatically ENCRYPTION ACTIVE: " + _shouldConstructDomProgrammatically);
+                    consoleLog("_shouldConstructDomProgrammatically ENCRYPTION ACTIVE: " + _shouldConstructDomProgrammatically);
                 }
 
                 settingFinishedCallback();

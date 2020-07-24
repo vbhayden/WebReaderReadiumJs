@@ -50,8 +50,8 @@ define(['jquery', 'URIjs', './discover_content_type'], function ($, URI, Content
             try {
                 pathRelativeToPackageRootUri = new URI(pathRelativeToPackageRoot);
             } catch(err) {
-                console.error(err);
-                console.log(pathRelativeToPackageRoot);
+                consoleError(err);
+                consoleLog(pathRelativeToPackageRoot);
             }
             if (pathRelativeToPackageRootUri && pathRelativeToPackageRootUri.is("absolute")) return pathRelativeToPackageRoot; //pathRelativeToPackageRootUri.scheme() == "http://", "https://", "data:", etc.
 
@@ -62,8 +62,8 @@ define(['jquery', 'URIjs', './discover_content_type'], function ($, URI, Content
                 //url = new URI(relativeUrl).absoluteTo(url).search('').hash('').toString();
                 url = new URI(url).search('').hash('').toString();
             } catch(err) {
-                console.error(err);
-                console.log(url);
+                consoleError(err);
+                consoleLog(url);
             }
             
             return url + (url.charAt(url.length-1) == '/' ? "" : "/") + pathRelativeToPackageRoot;
