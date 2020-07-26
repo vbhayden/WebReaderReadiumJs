@@ -16,7 +16,7 @@ define(['URIjs', 'readium_shared_js/views/iframe_loader', 'underscore', './disco
     var zipIframeLoader = function( getCurrentResourceFetcher, contentDocumentTextPreprocessor) {
 
         var isIE = (window.navigator.userAgent.indexOf("Trident") > 0 || window.navigator.userAgent.indexOf("Edge") > 0);
-            
+
         var basicIframeLoader = new IFrameLoader();
 
         var self = this;
@@ -34,12 +34,12 @@ define(['URIjs', 'readium_shared_js/views/iframe_loader', 'underscore', './disco
         this.loadIframe = function(iframe, src, callback, caller, attachedData) {
 
             if (!iframe.baseURI) {
-                
+
                 if (isIE && iframe.ownerDocument.defaultView.frameElement) {
-                    
+
                     //console.debug(iframe.ownerDocument.defaultView.location);
                     iframe.baseURI = iframe.ownerDocument.defaultView.frameElement.getAttribute("data-loadUri");
-                    
+
                     consoleLog("EPUB doc iframe src (BEFORE):");
                     consoleLog(src);
                     src = new URI(src).absoluteTo(iframe.baseURI).search('').hash('').toString();
@@ -47,28 +47,28 @@ define(['URIjs', 'readium_shared_js/views/iframe_loader', 'underscore', './disco
                 else if (typeof location !== 'undefined') {
                     iframe.baseURI = location.href + "";
                 }
-                
+
                 consoleError("!iframe.baseURI => " + iframe.baseURI);
             }
-            
+
             consoleLog("EPUB doc iframe src:");
             consoleLog(src);
             iframe.setAttribute("data-src", src);
-            
+
             consoleLog("EPUB doc iframe base URI:");
             consoleLog(iframe.baseURI);
             iframe.setAttribute("data-baseUri", iframe.baseURI);
-            
+
 
             var loadedDocumentUri = new URI(src).absoluteTo(iframe.baseURI).search('').hash('').toString();
 
             consoleLog("EPUB doc iframe LOAD URI:");
             consoleLog(loadedDocumentUri);
             iframe.setAttribute("data-loadUri", loadedDocumentUri);
-            
+
             var shouldConstructDomProgrammatically = getCurrentResourceFetcher().shouldConstructDomProgrammatically();
             if (shouldConstructDomProgrammatically) {
-                
+
                 consoleLog("shouldConstructDomProgrammatically...");
 
                 getCurrentResourceFetcher().fetchContentDocument(attachedData, loadedDocumentUri,
@@ -84,16 +84,24 @@ define(['URIjs', 'readium_shared_js/views/iframe_loader', 'underscore', './disco
                     }
                 );
             } else {
-                fetchContentDocument(loadedDocumentUri, function (contentDocumentHtml) {
-                      if (!contentDocumentHtml) {
-                          //failed to load content document
-                          callback.call(caller, false, attachedData);
-                      } else {
-                          self._loadIframeWithDocument(iframe, attachedData, contentDocumentHtml, function () {
-                              callback.call(caller, true, attachedData);
-                          });
-                      }
-                });
+                iframe.setAttribute("src", loadedDocumentUri);
+                // fetchContentDocument(loadedDocumentUri, function (contentDocumentHtml) {
+                //       if (!contentDocumentHtml) {
+                //           //failed to load content document
+                //           callback.call(caller, false, attachedData);
+                //       } else {
+                //           self._loadIframeWithDocument(iframe, attachedData, contentDocumentHtml, function () {
+                //               callback.call(caller, true, attachedData);
+                //           });
+                //       }
+                // });
+                let handler = iframe.onload;
+                let newHandler = () => {
+                    callback.call(caller, true);
+                    if (handler)
+                        handler();
+                }
+                iframe.onload = newHandler;
             }
         };
 
@@ -122,8 +130,9 @@ define(['URIjs', 'readium_shared_js/views/iframe_loader', 'underscore', './disco
                 } else {
                     blob = new Blob([contentDocumentData], {'type': contentType});
                 }
+                // debugger
                 documentDataUri = window.URL.createObjectURL(blob);
-                
+
                 //Chrome on iOS:
                 //data URL as substitute to BlobURI ... still iframe.contentWindow silent crash :(
                 // var reader = new FileReader();
@@ -133,7 +142,7 @@ define(['URIjs', 'readium_shared_js/views/iframe_loader', 'underscore', './disco
                 //     // iframe.src = documentDataUri;
                 // }
                 // reader.readAsDataURL(blob);
-                
+
             } else if (!chromeIOS) {
                 // Note that this does not support CSS selectors with XHTML namespaces (e.g. epub:type)
                 iframe.contentWindow.document.open();
@@ -151,24 +160,25 @@ define(['URIjs', 'readium_shared_js/views/iframe_loader', 'underscore', './disco
             }
 
             iframe.onload = function () {
+                // debugger
                 var doc = iframe.contentDocument || iframe.contentWindow.document;
 
                 // $('iframe', doc).each(function(i, child_iframe){
                 //     console.debug(child_iframe);
                 //     consoleLog(child_iframe.attr("data-src"));
                 // });
-                
+
                 if (iframe.contentWindow.frames) {
                     for (var i = 0; i < iframe.contentWindow.frames.length; i++) {
                         var child_iframe = iframe.contentWindow.frames[i];
                         // console.debug(child_iframe);
-                        
+
                         // consoleLog(child_iframe.frameElement.baseURI);
-                        
+
                         // consoleLog(child_iframe.location);
-                        
+
                         var childSrc = undefined;
-                        
+
                         try{
                             childSrc = child_iframe.frameElement.getAttribute("data-src");
                         } catch(err) {
@@ -177,34 +187,34 @@ define(['URIjs', 'readium_shared_js/views/iframe_loader', 'underscore', './disco
                             continue;
                         }
                         // consoleLog(childSrc);
-                        
+
                         if (!childSrc) {
                             if (child_iframe.frameElement.localName == "iframe") {
                                 consoleError("IFRAME data-src missing?!");
                             }
                             continue;
                         }
-                            
+
                         // console.debug(attachedData);
-                        var contentDocumentPathRelativeToPackage = attachedData.spineItem.href; 
-                            
+                        var contentDocumentPathRelativeToPackage = attachedData.spineItem.href;
+
                         var publicationFetcher = getCurrentResourceFetcher();
-                            
+
                         var contentDocumentPathRelativeToBase = publicationFetcher.convertPathRelativeToPackageToRelativeToBase(contentDocumentPathRelativeToPackage);
                         // consoleLog("contentDocumentPathRelativeToBase: " + contentDocumentPathRelativeToBase);
-    
+
                         var refAttrOrigVal_RelativeToBase = (new URI(childSrc)).absoluteTo(contentDocumentPathRelativeToBase).toString();
                         // consoleLog("refAttrOrigVal_RelativeToBase: " + refAttrOrigVal_RelativeToBase);
-    
+
                         var packageFullPath = publicationFetcher.getPackageFullPathRelativeToBase();
                         // consoleLog("packageFullPath: " + packageFullPath);
-    
-    
+
+
                         var refAttrOrigVal_RelativeToPackage = (new URI("/"+refAttrOrigVal_RelativeToBase)).relativeTo("/"+packageFullPath).toString();
                         // consoleLog("refAttrOrigVal_RelativeToPackage: " + refAttrOrigVal_RelativeToPackage);
 
                         var mimetype = ContentTypeDiscovery.identifyContentTypeFromFileName(refAttrOrigVal_RelativeToPackage);
-                        
+
                         var childIframeLoader = new zipIframeLoader(getCurrentResourceFetcher, contentDocumentTextPreprocessor);
                         childIframeLoader.loadIframe(
                             child_iframe.frameElement,
@@ -223,49 +233,49 @@ define(['URIjs', 'readium_shared_js/views/iframe_loader', 'underscore', './disco
                         );
                     }
                 }
-                
+
                 $('svg', doc).on("load", function(){
                     consoleLog('SVG loaded');
                 });
-                
+
                 self.updateIframeEvents(iframe);
-                
+
                 var mathJax = iframe.contentWindow.MathJax;
                 if (mathJax) {
-                    
+
                     consoleLog("MathJax VERSION: " + mathJax.cdnVersion + " // " + mathJax.fileversion + " // " + mathJax.version);
-                    
+
                     var useFontCache = true; // default in MathJax
-                    
+
                     // Firefox fails to render SVG otherwise
                     if (mathJax.Hub.Browser.isFirefox) {
                         useFontCache = false;
                     }
-                    
+
                     // Chrome 49+ fails to render SVG otherwise
                     // https://github.com/readium/readium-js/issues/138
                     if (mathJax.Hub.Browser.isChrome) {
                         useFontCache = false;
                     }
-                    
+
                     // Edge fails to render SVG otherwise
                     // https://github.com/readium/readium-js-viewer/issues/394#issuecomment-185382196
                     if (window.navigator.userAgent.indexOf("Edge") > 0) {
                         useFontCache = false;
                     }
-                    
+
                     mathJax.Hub.Config({showMathMenu:false, messageStyle: "none", showProcessingMessages: true, SVG:{useFontCache:useFontCache}});
-                
+
                     // If MathJax is being used, delay the callback until it has completed rendering
                     var mathJaxCallback = _.once(callback);
-                    
+
                     try {
                         mathJax.Hub.Queue(mathJaxCallback);
                     } catch (err) {
                         consoleError("MathJax fail!");
                         callback();
                     }
-                    
+
                     // Or at an 8 second timeout, which ever comes first
                     // window.setTimeout(mathJaxCallback, 8000);
                 } else {

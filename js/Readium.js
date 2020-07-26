@@ -12,20 +12,28 @@
 //  prior written permission.
 
 
-define(['readium_shared_js/globals', 'text!version.json', 'jquery', 'underscore', 'readium_shared_js/views/reader_view', 'readium_js/epub-fetch/publication_fetcher',
-    'readium_js/epub-model/package_document_parser', 'readium_js/epub-fetch/iframe_zip_loader', 'readium_shared_js/views/iframe_loader'
+define([
+    'readium_shared_js/globals',
+    'jquery',
+    'underscore',
+    'readium_shared_js/views/reader_view',
+    'readium_js/epub-fetch/publication_fetcher',
+    'readium_js/epub-model/package_document_parser',
+    'readium_js/epub-fetch/iframe_zip_loader',
+    'readium_shared_js/views/iframe_loader',
+    'StorageManager'
 ],
-    function(Globals, versionText, $, _, ReaderView, PublicationFetcher,
-        PackageParser, IframeZipLoader, IframeLoader) {
+    function(Globals, $, _, ReaderView, PublicationFetcher,
+        PackageParser, IframeZipLoader, IframeLoader, StorageManager) {
 
-        var DEBUG_VERSION_GIT = false;
+        // var DEBUG_VERSION_GIT = false;
 
         //polyfill to support old versions of some browsers
         window.BlobBuilder = window.BlobBuilder || window.WebKitBlobBuilder || window.MozBlobBuilder || window.MSBlobBuilder;
 
         var Readium = function(readiumOptions, readerOptions) {
 
-            var _options = { mathJaxUrl: readerOptions.mathJaxUrl };
+            // var _options = { mathJaxUrl: readerOptions.mathJaxUrl };
 
             var _contentDocumentTextPreprocessor = function(src, contentDocumentHtml) {
 
@@ -158,8 +166,44 @@ define(['readium_shared_js/globals', 'text!version.json', 'jquery', 'underscore'
                             items.push(openBookData.rootUrl + "/" + "content.opf");
 
                             let listener = () => {
-                                finishOpeningBook();
                                 unregisterSWListener("addedToCache", listener);
+                                StorageManager.initStorage(() => {
+                                    StorageManager.getFile("db://epub_library.json",
+                                        (bookshelf) => {
+                                            let found = false;
+                                            if (bookshelf) {
+                                                for (let book of bookshelf) {
+                                                    if (book.rootUrl === ebookURL) {
+                                                        found = true;
+                                                        break;
+                                                    }
+                                                }
+                                            } else {
+                                                bookshelf = [];
+                                            }
+                                            if (!found) {
+                                                let metadata = packageDocument.getMetadata();
+                                                bookshelf.push({
+                                                    id: metadata.id,
+                                                    packagePath: "OEBPS/content.opf",
+                                                    title: metadata.title,
+                                                    author: metadata.author,
+                                                    isLocal: true,
+                                                    rootDir: ebookURL,
+                                                    rootUrl: ebookURL,
+                                                    coverPath: metadata.cover_href,
+                                                    coverHref: openBookData.rootUrl + "/" + metadata.cover_href
+                                                });
+                                                StorageManager.saveFile("db://epub_library.json",
+                                                    bookshelf,
+                                                    () => { },
+                                                    consoleError);
+                                            }
+                                        },
+                                        consoleError);
+                                });
+
+                                finishOpeningBook();
                             };
 
                             registerSWListener("addedToCache", listener);
@@ -336,209 +380,6 @@ define(['readium_shared_js/globals', 'text!version.json', 'jquery', 'underscore'
 
             Globals.logEvent("READER_INITIALIZED", "EMIT", "Readium.js");
             ReadiumSDK.emit(ReadiumSDK.Events.READER_INITIALIZED, ReadiumSDK.reader);
-        };
-
-        Readium.version = JSON.parse(versionText);
-
-        Readium.getVersion = function(callback) {
-
-            var version = Readium.version;
-
-            if (version.needsPopulating) {
-
-                if (DEBUG_VERSION_GIT) {
-                    consoleLog("version.json needsPopulating ...");
-                }
-
-                var nextRepo = function(i) {
-                    if (i >= version.repos.length) {
-                        delete version.needsPopulating;
-                        delete version.repos;
-
-                        if (DEBUG_VERSION_GIT) {
-                            consoleLog("version");
-                            consoleLog(version);
-                        }
-
-                        Readium.version = version;
-                        callback(version);
-                        return;
-                    }
-
-                    var repo = version.repos[i];
-
-                    if (DEBUG_VERSION_GIT) {
-
-                        consoleLog("##########################");
-
-                        consoleLog("repo.name");
-                        consoleLog(repo.name);
-
-                        consoleLog("repo.path");
-                        consoleLog(repo.path);
-                    }
-
-                    version[repo.name] = {};
-                    version[repo.name].timestamp = new Date().getTime();
-
-                    //
-                    // "readiumJs":
-                    // {
-                    //   "sha":"xxx",
-                    //   "clean":false,
-                    //   "version":"yyy",
-                    //   "chromeVersion":"yyy",
-                    //   "tag":"zzz",
-                    //   "branch":"fff",
-                    //   "release":false,
-                    //   "timestamp":000
-                    // }
-
-                    $.getJSON(repo.path + '/package.json', function(data) {
-
-                        if (DEBUG_VERSION_GIT) {
-                            consoleLog("version");
-                            consoleLog(data.version);
-                        }
-
-                        version[repo.name].version = data.version;
-                        version[repo.name].chromeVersion = '2.' + data.version.substring(2);
-
-                        var getRef = function(gitFolder, repo, ref) {
-                            var url = gitFolder + '/' + ref;
-
-                            if (DEBUG_VERSION_GIT) {
-                                consoleLog("getRef");
-                                consoleLog(url);
-                            }
-
-                            $.get(url, function(data) {
-
-                                version[repo.name].branch = ref;
-
-                                var sha = data.substring(0, data.length - 1);
-                                version[repo.name].sha = sha;
-
-                                if (DEBUG_VERSION_GIT) {
-                                    consoleLog("getRef OKAY");
-                                    consoleLog(url);
-
-                                    consoleLog(data);
-
-                                    consoleLog("branch");
-                                    consoleLog(ref);
-
-                                    consoleLog("sha");
-                                    consoleLog(sha);
-                                }
-
-                                nextRepo(++i);
-
-                            }).fail(function(err) {
-
-                                if (DEBUG_VERSION_GIT) {
-                                    consoleLog("getRef ERROR");
-                                    consoleLog(url);
-                                }
-
-                                nextRepo(++i);
-                            });
-                        };
-
-                        var getGit = function(repo) {
-                            var url = repo.path + '/.git';
-
-                            if (DEBUG_VERSION_GIT) {
-                                consoleLog("getGit");
-                                consoleLog(url);
-                            }
-
-                            $.get(url, function(data) {
-
-                                if (DEBUG_VERSION_GIT) {
-                                    consoleLog("getGit OKAY");
-                                    consoleLog(url);
-
-                                    consoleLog(data);
-                                }
-
-                                if (data.indexOf('gitdir: ') == 0) {
-
-                                    var gitDir = repo.path + "/" + data.substring('gitdir: '.length).trim();
-
-                                    if (DEBUG_VERSION_GIT) {
-                                        consoleLog("gitdir: OKAY");
-                                        consoleLog(gitDir);
-                                    }
-
-                                    getHead(gitDir, repo);
-
-                                } else {
-                                    if (DEBUG_VERSION_GIT) {
-                                        consoleLog("gitdir: ERROR");
-                                    }
-
-                                    nextRepo(++i);
-                                }
-
-                            }).fail(function(err) {
-
-                                if (DEBUG_VERSION_GIT) {
-                                    consoleLog("getGit ERROR");
-                                    consoleLog(url);
-                                }
-
-                                nextRepo(++i);
-                            });
-                        };
-
-                        var getHead = function(gitFolder, repo, first) {
-                            var url = gitFolder + "/HEAD";
-
-                            if (DEBUG_VERSION_GIT) {
-                                consoleLog("getHead");
-                                consoleLog(url);
-                            }
-
-                            $.get(url, function(data) {
-
-                                if (DEBUG_VERSION_GIT) {
-                                    consoleLog("getHead OKAY");
-                                    consoleLog(url);
-
-                                    consoleLog(data);
-                                }
-
-                                var ref = data.substring(5, data.length - 1);
-                                getRef(gitFolder, repo, ref);
-
-                            }).fail(function(err) {
-
-                                if (DEBUG_VERSION_GIT) {
-                                    consoleLog("getHead ERROR");
-                                    consoleLog(url);
-                                }
-
-                                if (first) {
-                                    getGit(repo);
-                                } else {
-                                    if (DEBUG_VERSION_GIT) {
-                                        consoleLog("getHead ABORT");
-                                    }
-                                    nextRepo(++i);
-                                }
-                            });
-                        };
-
-                        getHead(repo.path + '/.git', repo, true);
-
-                    }).fail(function(err) { nextRepo(++i); });
-                };
-
-
-                nextRepo(0);
-
-            } else { callback(version); }
         };
 
         return Readium;
