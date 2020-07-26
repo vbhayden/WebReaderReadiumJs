@@ -194,7 +194,7 @@ define([
                                                     coverPath: metadata.cover_href,
                                                     coverHref: openBookData.rootUrl + "/" + metadata.cover_href
                                                 });
-                                                StorageManager.saveFile("db://epub_library.json",
+                                                StorageManager.saveBookshelf("db://epub_library.json",
                                                     bookshelf,
                                                     () => { },
                                                     consoleError);
