@@ -11,8 +11,8 @@
 //  used to endorse or promote products derived from this software without specific 
 //  prior written permission.
 
-define(['jquery', 'underscore', 'URIjs', 'readium_cfi_js'],
-    function ($, _, URI, epubCFI) {
+define(['underscore', 'URIjs', 'readium_cfi_js'],
+    function (_, URI, epubCFI) {
 
     // Description: This model provides an interface for navigating an EPUB's package document
     var PackageDocument = function(packageDocumentURL, packageDocumentDOM, resourceFetcher, metadata, spine, manifest) {

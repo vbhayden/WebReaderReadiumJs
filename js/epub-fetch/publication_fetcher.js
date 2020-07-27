@@ -25,9 +25,9 @@ Modified in commit e54c04127efa043e6b11ae6fc4bf6aef7cff4536
 //  used to endorse or promote products derived from this software without specific
 //  prior written permission.
 
-define(['jquery', 'URIjs', './markup_parser', './plain_resource_fetcher', './zip_resource_fetcher',
+define(['URIjs', './markup_parser', './plain_resource_fetcher', './zip_resource_fetcher',
     './content_document_fetcher', './resource_cache', './encryption_handler', './discover_content_type', 'readium_shared_js/helpers'],
-    function ($, URI, MarkupParser, PlainResourceFetcher, ZipResourceFetcher, ContentDocumentFetcher,
+    function (URI, MarkupParser, PlainResourceFetcher, ZipResourceFetcher, ContentDocumentFetcher,
               ResourceCache, EncryptionHandler, ContentTypeDiscovery, Helpers) {
 
     var PublicationFetcher = function(ebookURL, jsLibRoot, sourceWindow, cacheSizeEvictThreshold, contentDocumentTextPreprocessor, contentType) {

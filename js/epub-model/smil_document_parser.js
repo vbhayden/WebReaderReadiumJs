@@ -11,7 +11,7 @@
 //  used to endorse or promote products derived from this software without specific 
 //  prior written permission.
 
-define(['jquery', 'underscore'], function ($, _) {
+define(['underscore'], function (_) {
 
     // `SmilDocumentParser` is used to parse the xml of an epub package
     // document and build a javascript object. The constructor accepts an

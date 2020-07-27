@@ -14,7 +14,6 @@
 
 define([
     'readium_shared_js/globals',
-    'jquery',
     'underscore',
     'readium_shared_js/views/reader_view',
     'readium_js/epub-fetch/publication_fetcher',
@@ -23,7 +22,7 @@ define([
     'readium_shared_js/views/iframe_loader',
     'StorageManager'
 ],
-    function(Globals, $, _, ReaderView, PublicationFetcher,
+    function(Globals, _, ReaderView, PublicationFetcher,
         PackageParser, IframeZipLoader, IframeLoader, StorageManager) {
 
         // var DEBUG_VERSION_GIT = false;

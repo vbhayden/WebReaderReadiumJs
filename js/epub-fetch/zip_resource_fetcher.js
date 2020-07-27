@@ -25,7 +25,7 @@ Modified in commit 48df590cd52edc20e82f410771c121f6dfceb46e
 //  used to endorse or promote products derived from this software without specific
 //  prior written permission.
 
-define(['jquery', 'URIjs', './discover_content_type', 'zip-ext', 'readium_shared_js/helpers'], function ($, URI, ContentTypeDiscovery, zip, Helpers) {
+define(['URIjs', './discover_content_type', 'zip-ext', 'readium_shared_js/helpers'], function (URI, ContentTypeDiscovery, zip, Helpers) {
 
     var ZipResourceFetcher = function(parentFetcher, libDir) {
 

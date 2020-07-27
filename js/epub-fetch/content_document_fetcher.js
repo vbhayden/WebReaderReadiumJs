@@ -26,8 +26,8 @@ Modified in commit 81f1e18bc58784d67bd4fa1302875f1ef4e38049
 //  prior written permission.
 
 define(
-    ['jquery', 'underscore', 'URIjs', './discover_content_type'],
-    function ($, _, URI, ContentTypeDiscovery) {
+    ['underscore', 'URIjs', './discover_content_type'],
+    function (_, URI, ContentTypeDiscovery) {
 
 
         var ContentDocumentFetcher = function (publicationFetcher, spineItem, loadedDocumentUri, publicationResourcesCache, contentDocumentTextPreprocessor) {
