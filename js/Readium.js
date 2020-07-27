@@ -33,7 +33,7 @@ define([
 
         var Readium = function(readiumOptions, readerOptions) {
 
-            // var _options = { mathJaxUrl: readerOptions.mathJaxUrl };
+            var _options = { mathJaxUrl: readerOptions.mathJaxUrl };
 
             var _contentDocumentTextPreprocessor = function(src, contentDocumentHtml) {
 
@@ -62,9 +62,9 @@ define([
 
                 var scripts = "<script type=\"text/javascript\">(" + injectedScript.toString() + ")()<\/script>";
 
-                // if (_options && _options.mathJaxUrl && contentDocumentHtml.search(/<(\w+:|)(?=math)/) >= 0) {
-                //     scripts += "<script type=\"text/javascript\" src=\"" + _options.mathJaxUrl + "\"> <\/script>";
-                // }
+                if (_options && _options.mathJaxUrl && contentDocumentHtml.search(/<(\w+:|)(?=math)/) >= 0) {
+                    scripts += "<script type=\"text/javascript\" src=\"" + _options.mathJaxUrl + "\"> <\/script>";
+                }
 
                 contentDocumentHtml = contentDocumentHtml.replace(/(<head[\s\S]*?>)/, "$1" + base + scripts);
 
