@@ -20,10 +20,13 @@ define([
     'readium_js/epub-model/package_document_parser',
     'readium_js/epub-fetch/iframe_zip_loader',
     'readium_shared_js/views/iframe_loader',
-    'StorageManager'
+    'StorageManager',
+    'readium_js_viewer/Dialogs',
+    'i18nStrings',
+    'readium_js_viewer/workers/Messages'
 ],
     function(Globals, _, ReaderView, PublicationFetcher,
-        PackageParser, IframeZipLoader, IframeLoader, StorageManager) {
+        PackageParser, IframeZipLoader, IframeLoader, StorageManager, Dialogs, Strings, Messages) {
 
         // var DEBUG_VERSION_GIT = false;
 
@@ -158,14 +161,25 @@ define([
 
                         if (!(ebookURL instanceof File) && !ebookURL.endsWith(".epub")) {
                             let items = [];
+
+                            var title = Strings.import_dlg_title + " [ " + packageDocument.getMetadata().title + " ]";
+                            Dialogs.showModalProgress(title, Strings.storing_file);
+
                             packageDocument.manifest.each((m) => {
                                 items.push(openBookData.rootUrl + "/" + m.href);
                             });
 
                             items.push(openBookData.rootUrl + "/" + "content.opf");
 
+                            let pListener = (data) => {
+                                let percent = 100 * ((data.total - data.remaining) / data.total);
+                                Dialogs.updateProgress(percent, Messages.PROGRESS_WRITING, title);
+                            }
+
                             let listener = () => {
                                 unregisterSWListener("addedToCache", listener);
+                                unregisterSWListener("addToCacheProgress", pListener);
+                                Dialogs.closeModal();
                                 StorageManager.initStorage(() => {
                                     StorageManager.getFile("db://epub_library.json",
                                         (bookshelf) => {
@@ -205,6 +219,7 @@ define([
                                 finishOpeningBook();
                             };
 
+                            registerSWListener("addToCacheProgress", pListener);
                             registerSWListener("addedToCache", listener);
 
                             sendSWMsg("addToCache", {
