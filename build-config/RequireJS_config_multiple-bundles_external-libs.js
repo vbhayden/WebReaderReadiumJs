@@ -24,9 +24,8 @@ require.config({
             name: "readium-external-libs",
             create: true,
             include: ["mime-types", "zip", "zip-ext", "zip-fs", "cryptoJs/sha1", "cryptoJs/core",
-            'jquery', 'readium_cfi_js',
-            'underscore', 'URIjs', 'punycode', 'SecondLevelDomains', 'IPv6',
-            'jquerySizes', 'domReady', 'eventEmitter', 'console_shim', 'cssom']
+            'readium_cfi_js', 'underscore', 'URIjs', 'punycode', 'SecondLevelDomains', 'IPv6',
+            'domReady', 'eventEmitter', 'console_shim', 'cssom']
         }
     ]
 });

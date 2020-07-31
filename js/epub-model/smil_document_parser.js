@@ -11,7 +11,7 @@
 //  used to endorse or promote products derived from this software without specific 
 //  prior written permission.
 
-define(['jquery', 'underscore'], function ($, _) {
+define(['underscore'], function (_) {
 
     // `SmilDocumentParser` is used to parse the xml of an epub package
     // document and build a javascript object. The constructor accepts an
@@ -64,7 +64,7 @@ define(['jquery', 'underscore'], function ($, _) {
                 if (defaultValue !== undefined) {
                     toItem[destProperty] = defaultValue;
                 } else {
-                    console.log("Required property " + property + " not found in smil node " + fromNode.nodeName);
+                    consoleLog("Required property " + property + " not found in smil node " + fromNode.nodeName);
                 }
             }
         };
@@ -177,7 +177,7 @@ define(['jquery', 'underscore'], function ($, _) {
                     var manifestItemSMIL = packageDocument.manifest.getManifestItemByIdref(spineItem.media_overlay_id);
 
                     if (!manifestItemSMIL) {
-                        console.error("Cannot find SMIL manifest item for spine/manifest item?! " + spineItem.media_overlay_id);
+                        consoleError("Cannot find SMIL manifest item for spine/manifest item?! " + spineItem.media_overlay_id);
                         continue;
                     }
                     //ASSERT manifestItemSMIL.media_type === "application/smil+xml"
@@ -196,8 +196,8 @@ define(['jquery', 'underscore'], function ($, _) {
                         allFakeSmil = false;
                         myDeferred.resolve();
                     }, function(myDeferred, parseError) {
-                        console.log('Error when parsing SMIL manifest item ' + manifestItemSMIL.href + ':');
-                        console.log(parseError);
+                        consoleLog('Error when parsing SMIL manifest item ' + manifestItemSMIL.href + ':');
+                        consoleLog(parseError);
                         myDeferred.resolve();
                     });
                 } else {

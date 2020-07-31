@@ -26,8 +26,8 @@ Modified in commit 81f1e18bc58784d67bd4fa1302875f1ef4e38049
 //  prior written permission.
 
 define(
-    ['jquery', 'underscore', 'URIjs', './discover_content_type'],
-    function ($, _, URI, ContentTypeDiscovery) {
+    ['underscore', 'URIjs', './discover_content_type'],
+    function (_, URI, ContentTypeDiscovery) {
 
 
         var ContentDocumentFetcher = function (publicationFetcher, spineItem, loadedDocumentUri, publicationResourcesCache, contentDocumentTextPreprocessor) {
@@ -85,7 +85,7 @@ define(
 
                 if (_publicationFetcher.shouldFetchMediaAssetsProgrammatically()) {
                     
-                    console.log("fetchMediaAssetsProgrammatically ...");
+                    consoleLog("fetchMediaAssetsProgrammatically ...");
 		    
                     resolveDocumentImages(resolutionDeferreds, onerror);
                     
@@ -112,7 +112,7 @@ define(
                 resolveDocumentEmbeddedStylesheets(resolutionDeferreds, onerror);
 
                 $.when.apply($, resolutionDeferreds).done(function () {
-                    console.log("DOM BLOB URi DONE: " + loadedDocumentUri);
+                    consoleLog("DOM BLOB URi DONE: " + loadedDocumentUri);
                     resolvedDocumentCallback(_contentDocumentDom);
                 });
 
@@ -158,12 +158,12 @@ define(
 
                 var refAttrUri = new URI(refAttrOrigVal);
                 if (refAttrUri.scheme() !== '') {
-                    console.log("HTTP / absolute scheme res: " + refAttrOrigVal);
+                    consoleLog("HTTP / absolute scheme res: " + refAttrOrigVal);
 
                     return;
 
                 } else if (refAttrOrigVal.indexOf("/") == 0) {
-                    console.log("Absolute path res: " + refAttrOrigVal);
+                    consoleLog("Absolute path res: " + refAttrOrigVal);
 
                     var HTTPServerRootFolder =
 			window.location ? (

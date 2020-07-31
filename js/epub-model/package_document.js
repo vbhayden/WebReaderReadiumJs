@@ -11,8 +11,8 @@
 //  used to endorse or promote products derived from this software without specific 
 //  prior written permission.
 
-define(['jquery', 'underscore', 'URIjs', 'readium_cfi_js'],
-    function ($, _, URI, epubCFI) {
+define(['underscore', 'URIjs', 'readium_cfi_js'],
+    function (_, URI, epubCFI) {
 
     // Description: This model provides an interface for navigating an EPUB's package document
     var PackageDocument = function(packageDocumentURL, packageDocumentDOM, resourceFetcher, metadata, spine, manifest) {
@@ -113,7 +113,7 @@ define(['jquery', 'underscore', 'URIjs', 'readium_cfi_js'],
         this.getTocText = function(callback) {
             var toc = this.getToc();
             if (!toc) {
-                console.error("No TOC?!");
+                consoleError("No TOC?!");
                 callback(undefined);
                 return;
             }
@@ -121,8 +121,8 @@ define(['jquery', 'underscore', 'URIjs', 'readium_cfi_js'],
             resourceFetcher.relativeToPackageFetchFileContents(toc, 'text', function (tocDocumentText) {
                 callback(tocDocumentText)
             }, function (err) {
-                console.error('ERROR fetching TOC from [' + toc + ']:');
-                console.error(err);
+                consoleError('ERROR fetching TOC from [' + toc + ']:');
+                consoleError(err);
                 callback(undefined);
             });
         };

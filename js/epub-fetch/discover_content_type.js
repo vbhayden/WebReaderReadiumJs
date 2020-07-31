@@ -11,7 +11,7 @@
 //  used to endorse or promote products derived from this software without specific 
 //  prior written permission.
 
-define(['jquery', 'URIjs'], function ($, URI) {
+define(['URIjs'], function (URI) {
 
     var _instance = undefined;
 
@@ -53,7 +53,7 @@ define(['jquery', 'URIjs'], function ($, URI) {
             }).getResponseHeader('Content-Type');
             if (contentType === null) {
                 contentType = self.identifyContentTypeFromFileName(contentUrl);
-                console.log('guessed contentType [' + contentType + '] from URI [' + contentUrl +
+                consoleLog('guessed contentType [' + contentType + '] from URI [' + contentUrl +
                     ']. Configuring the web server to provide the content type is recommended.');
 
             }

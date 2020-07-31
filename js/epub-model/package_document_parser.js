@@ -11,9 +11,9 @@
 //  used to endorse or promote products derived from this software without specific
 //  prior written permission.
 
-define(['jquery', 'underscore', '../epub-fetch/markup_parser', 'URIjs', './package_document',
+define(['underscore', '../epub-fetch/markup_parser', 'URIjs', './package_document',
         './smil_document_parser', './metadata', './manifest', 'readium_cfi_js'],
-    function($, _, MarkupParser, URI, PackageDocument, SmilDocumentParser, Metadata,
+    function(_, MarkupParser, URI, PackageDocument, SmilDocumentParser, Metadata,
              Manifest, epubCFI) {
 
         // `PackageDocumentParser` is used to parse the xml of an epub package
@@ -102,7 +102,7 @@ define(['jquery', 'underscore', '../epub-fetch/markup_parser', 'URIjs', './packa
                             var fixLayoutVal = $(fixLayoutProp).text();
                             if(fixLayoutVal === "true") {
                                 metadata.rendition_layout = "pre-paginated";
-                                console.log("using com.apple.ibooks.display-options.xml fixed-layout property");
+                                consoleLog("using com.apple.ibooks.display-options.xml fixed-layout property");
                             }
                         }
                     }
@@ -111,7 +111,7 @@ define(['jquery', 'underscore', '../epub-fetch/markup_parser', 'URIjs', './packa
 
                 }, function (err) {
 
-                    //console.log("com.apple.ibooks.display-options.xml not found");
+                    //consoleLog("com.apple.ibooks.display-options.xml not found");
                     dff.resolve();
                 });
             }
@@ -336,10 +336,10 @@ define(['jquery', 'underscore', '../epub-fetch/markup_parser', 'URIjs', './packa
                     media_type: $currManifestElement.attr("media-type") ? $currManifestElement.attr("media-type") : "",
                     properties: $currManifestElement.attr("properties") ? $currManifestElement.attr("properties") : ""
                 };
-                // console.log('pushing manifest item to JSON manifest. currManifestElementHref: [' + currManifestElementHref +
+                // consoleLog('pushing manifest item to JSON manifest. currManifestElementHref: [' + currManifestElementHref +
                 //     '], manifestItem.href: [' + manifestItem.href +
                 //     '], manifestItem:');
-                // console.log(manifestItem);
+                // consoleLog(manifestItem);
                 jsonManifest.push(manifestItem);
             });
 
