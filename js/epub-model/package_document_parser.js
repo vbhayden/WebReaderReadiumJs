@@ -237,6 +237,8 @@ define(['underscore', '../epub-fetch/markup_parser', 'URIjs', './package_documen
             metadata.rendition_spread = getMetaElemPropertyText(metadataElem, "rendition:spread");
             metadata.rendition_flow = getMetaElemPropertyText(metadataElem, "rendition:flow");
 
+            metadata.reader_css  = getMetaElemPropertyText(metadataElem, "pebl:readercss");
+
 
 
 
