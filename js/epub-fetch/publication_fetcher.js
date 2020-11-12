@@ -286,7 +286,8 @@ define(['URIjs', './markup_parser', './plain_resource_fetcher', './zip_resource_
         // (starting with "/", already relative to the EPUB archive's base folder)
         // For example: /META-INF/
         this.relativeToPackageFetchFileContents = function(relativeToPackagePath, fetchMode, fetchCallback, errorCallback) {
-
+            if (window.documentCacheMap && window.documentCacheMap[relativeToPackagePath])
+                return fetchCallback(window.documentCacheMap[relativeToPackagePath]);
             var pathRelativeToEpubRoot = decodeURIComponent(self.convertPathRelativeToPackageToRelativeToBase(relativeToPackagePath));
 
             consoleLog("FETCHING ... " + pathRelativeToEpubRoot);

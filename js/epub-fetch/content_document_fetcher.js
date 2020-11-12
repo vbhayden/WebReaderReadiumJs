@@ -154,6 +154,7 @@ define(
         			    $(resolvedElem).attr('data-epubZipOrigHref', refAttrOrigVal);
         			    $(resolvedElem).attr(refAttr, newResourceUrl);
         		    }
+                    window.mediaCacheMap[newResourceUrl] = refAttrOrigVal;
                 }
 
                 var refAttrUri = new URI(refAttrOrigVal);
