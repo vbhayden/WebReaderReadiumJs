@@ -75,7 +75,7 @@ define(['URIjs', './discover_content_type', 'zip-ext', 'readium_shared_js/helper
                             callback(_zipFs, onerror);
                         },
                         function () {
-                            consoleError("ZIP ERROR");
+                            console.error("ZIP ERROR");
                             onerror.apply(this, arguments);
                         }
                     );
@@ -89,7 +89,7 @@ define(['URIjs', './discover_content_type', 'zip-ext', 'readium_shared_js/helper
                             callback(_zipFs, onerror);
                         },
                         function () {
-                            consoleError("ZIP ERROR");
+                            console.error("ZIP ERROR");
                             onerror.apply(this, arguments);
                         }
                     );
@@ -132,14 +132,14 @@ define(['URIjs', './discover_content_type', 'zip-ext', 'readium_shared_js/helper
                         )
                         : undefined;
 
-                    // consoleLog(error);
-                    // if (!error) consoleLog(arguments);
+                    // console.log(error);
+                    // if (!error) console.log(arguments);
 
                     var isReadiumError = error ? (error.message.indexOf(READIUM_ERROR_PREFIX) == 0) : false;
 
                     // we fallback to Blobl for all other types of errors (not just those emanating from the zip lib, but also from the readCallback())
                     if (!isReadiumError && !(ebookURL instanceof Blob) && !(ebookURL instanceof File)) {
-                        consoleLog("Zip lib failed to load zipped EPUB via HTTP, trying alternative HTTP fetch... (" + ebookURL + ")");
+                        console.log("Zip lib failed to load zipped EPUB via HTTP, trying alternative HTTP fetch... (" + ebookURL + ")");
 
                         var xhr = new XMLHttpRequest();
 
@@ -147,14 +147,14 @@ define(['URIjs', './discover_content_type', 'zip-ext', 'readium_shared_js/helper
 
                         xhr.onreadystatechange = function(){
 
-                            //consoleLog("XMLHttpRequest readyState: " + this.readyState);
+                            //console.log("XMLHttpRequest readyState: " + this.readyState);
                             if (this.readyState != 4) return;
 
                             var success = xhr.status >= 200 && xhr.status < 300 || xhr.status === 304;
                             if (success) {
                                 ebookURL = this.response;
                                 //ebookURL_filepath = Helpers.getEbookUrlFilePath(ebookURL);
-                                //consoleLog(ebookURL_filepath);
+                                //console.log(ebookURL_filepath);
 
                                 _zipFs = undefined;
 
@@ -175,13 +175,13 @@ define(['URIjs', './discover_content_type', 'zip-ext', 'readium_shared_js/helper
                         xhr.send(null);
 
     //                     $.get(ebookURL, function(data) {
-    // consoleLog(typeof data);
+    // console.log(typeof data);
     //                         ebookURL_filepath = Helpers.getEbookUrlFilePath(ebookURL);
     //                         //fetchFileContents(relativePathRelativeToPackageRoot, readCallback, onerror);
 
     //                     }).fail(function(err) {
 
-    //                         consoleLog(err);
+    //                         console.log(err);
     //                         onerror.apply(this, arguments);
     //                     });
 
@@ -201,8 +201,8 @@ define(['URIjs', './discover_content_type', 'zip-ext', 'readium_shared_js/helper
             try {
                 pathRelativeToPackageRootUri = new URI(pathRelativeToPackageRoot);
             } catch(err) {
-                consoleError(err);
-                consoleLog(pathRelativeToPackageRoot);
+                console.error(err);
+                console.log(pathRelativeToPackageRoot);
             }
             if (pathRelativeToPackageRootUri && pathRelativeToPackageRootUri.is("absolute")) return pathRelativeToPackageRoot; //pathRelativeToPackageRootUri.scheme() == "http://", "https://", "data:", etc.
 
@@ -213,8 +213,8 @@ define(['URIjs', './discover_content_type', 'zip-ext', 'readium_shared_js/helper
                 //url = new URI(relativeUrl).absoluteTo(url).search('').hash('').toString();
                 url = new URI(url).search('').hash('').toString();
             } catch(err) {
-                consoleError(err);
-                consoleLog(url);
+                console.error(err);
+                console.log(url);
             }
 
             return url + (url.charAt(url.length-1) == '/' ? "" : "/") + pathRelativeToPackageRoot;

@@ -62,7 +62,7 @@ define(['cryptoJs/sha1'], function (CryptoJS_SHA1) {
             var matchResults = uuidRegexp.exec(id);
             var rawUuid = matchResults[2] + matchResults[3] + matchResults[4] + matchResults[5] + matchResults[6];
             if (!rawUuid || rawUuid.length != 32) {
-                consoleError('Bad UUID format for ID :' + id);
+                console.error('Bad UUID format for ID :' + id);
             }
             var byteArray = [];
             for (var i = 0; i < 16; i++) {
@@ -149,7 +149,7 @@ define(['cryptoJs/sha1'], function (CryptoJS_SHA1) {
                 //var cipherReferenceURI = "/" + $(CipherReference).attr('URI');
                 var cipherReferenceURI = $(CipherReference).attr('URI');
                 
-                consoleLog('Encryption/obfuscation algorithm ' + encryptionAlgorithm + ' specified for ' +
+                console.log('Encryption/obfuscation algorithm ' + encryptionAlgorithm + ' specified for ' +
                     cipherReferenceURI);
 
                 if(!encryptionData.encryptions) {

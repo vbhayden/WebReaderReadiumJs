@@ -102,7 +102,7 @@ define(['underscore', '../epub-fetch/markup_parser', 'URIjs', './package_documen
                             var fixLayoutVal = $(fixLayoutProp).text();
                             if(fixLayoutVal === "true") {
                                 metadata.rendition_layout = "pre-paginated";
-                                consoleLog("using com.apple.ibooks.display-options.xml fixed-layout property");
+                                console.log("using com.apple.ibooks.display-options.xml fixed-layout property");
                             }
                         }
                     }
@@ -111,7 +111,7 @@ define(['underscore', '../epub-fetch/markup_parser', 'URIjs', './package_documen
 
                 }, function (err) {
 
-                    //consoleLog("com.apple.ibooks.display-options.xml not found");
+                    //console.log("com.apple.ibooks.display-options.xml not found");
                     dff.resolve();
                 });
             }
@@ -338,10 +338,10 @@ define(['underscore', '../epub-fetch/markup_parser', 'URIjs', './package_documen
                     media_type: $currManifestElement.attr("media-type") ? $currManifestElement.attr("media-type") : "",
                     properties: $currManifestElement.attr("properties") ? $currManifestElement.attr("properties") : ""
                 };
-                // consoleLog('pushing manifest item to JSON manifest. currManifestElementHref: [' + currManifestElementHref +
+                // console.log('pushing manifest item to JSON manifest. currManifestElementHref: [' + currManifestElementHref +
                 //     '], manifestItem.href: [' + manifestItem.href +
                 //     '], manifestItem:');
-                // consoleLog(manifestItem);
+                // console.log(manifestItem);
                 jsonManifest.push(manifestItem);
             });
 

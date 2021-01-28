@@ -50,8 +50,8 @@ define(['URIjs', './discover_content_type'], function (URI, ContentTypeDiscovery
             try {
                 pathRelativeToPackageRootUri = new URI(pathRelativeToPackageRoot);
             } catch(err) {
-                consoleError(err);
-                consoleLog(pathRelativeToPackageRoot);
+                console.error(err);
+                console.log(pathRelativeToPackageRoot);
             }
             if (pathRelativeToPackageRootUri && pathRelativeToPackageRootUri.is("absolute")) return pathRelativeToPackageRoot; //pathRelativeToPackageRootUri.scheme() == "http://", "https://", "data:", etc.
 
@@ -62,8 +62,8 @@ define(['URIjs', './discover_content_type'], function (URI, ContentTypeDiscovery
                 //url = new URI(relativeUrl).absoluteTo(url).search('').hash('').toString();
                 url = new URI(url).search('').hash('').toString();
             } catch(err) {
-                consoleError(err);
-                consoleLog(url);
+                console.error(err);
+                console.log(url);
             }
             
             return url + (url.charAt(url.length-1) == '/' ? "" : "/") + pathRelativeToPackageRoot;

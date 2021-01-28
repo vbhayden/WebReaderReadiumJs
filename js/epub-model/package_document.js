@@ -113,7 +113,7 @@ define(['underscore', 'URIjs', 'readium_cfi_js'],
         this.getTocText = function(callback) {
             var toc = this.getToc();
             if (!toc) {
-                consoleError("No TOC?!");
+                console.error("No TOC?!");
                 callback(undefined);
                 return;
             }
@@ -121,8 +121,8 @@ define(['underscore', 'URIjs', 'readium_cfi_js'],
             resourceFetcher.relativeToPackageFetchFileContents(toc, 'text', function (tocDocumentText) {
                 callback(tocDocumentText)
             }, function (err) {
-                consoleError('ERROR fetching TOC from [' + toc + ']:');
-                consoleError(err);
+                console.error('ERROR fetching TOC from [' + toc + ']:');
+                console.error(err);
                 callback(undefined);
             });
         };

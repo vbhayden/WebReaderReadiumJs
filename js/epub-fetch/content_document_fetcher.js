@@ -85,7 +85,7 @@ define(
 
                 if (_publicationFetcher.shouldFetchMediaAssetsProgrammatically()) {
                     
-                    consoleLog("fetchMediaAssetsProgrammatically ...");
+                    console.log("fetchMediaAssetsProgrammatically ...");
 		    
                     resolveDocumentImages(resolutionDeferreds, onerror);
                     
@@ -112,7 +112,7 @@ define(
                 resolveDocumentEmbeddedStylesheets(resolutionDeferreds, onerror);
 
                 $.when.apply($, resolutionDeferreds).done(function () {
-                    consoleLog("DOM BLOB URi DONE: " + loadedDocumentUri);
+                    console.log("DOM BLOB URi DONE: " + loadedDocumentUri);
                     resolvedDocumentCallback(_contentDocumentDom);
                 });
 
@@ -159,12 +159,12 @@ define(
 
                 var refAttrUri = new URI(refAttrOrigVal);
                 if (refAttrUri.scheme() !== '') {
-                    consoleLog("HTTP / absolute scheme res: " + refAttrOrigVal);
+                    console.log("HTTP / absolute scheme res: " + refAttrOrigVal);
 
                     return;
 
                 } else if (refAttrOrigVal.indexOf("/") == 0) {
-                    consoleLog("Absolute path res: " + refAttrOrigVal);
+                    console.log("Absolute path res: " + refAttrOrigVal);
 
                     var HTTPServerRootFolder =
 			window.location ? (

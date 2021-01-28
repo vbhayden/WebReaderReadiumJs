@@ -40,36 +40,36 @@ define(['URIjs', 'readium_shared_js/views/iframe_loader', 'underscore', './disco
                     //console.debug(iframe.ownerDocument.defaultView.location);
                     iframe.baseURI = iframe.ownerDocument.defaultView.frameElement.getAttribute("data-loadUri");
 
-                    consoleLog("EPUB doc iframe src (BEFORE):");
-                    consoleLog(src);
+                    console.log("EPUB doc iframe src (BEFORE):");
+                    console.log(src);
                     src = new URI(src).absoluteTo(iframe.baseURI).search('').hash('').toString();
                 }
                 else if (typeof location !== 'undefined') {
                     iframe.baseURI = location.href + "";
                 }
 
-                consoleError("!iframe.baseURI => " + iframe.baseURI);
+                console.error("!iframe.baseURI => " + iframe.baseURI);
             }
 
-            consoleLog("EPUB doc iframe src:");
-            consoleLog(src);
+            console.log("EPUB doc iframe src:");
+            console.log(src);
             iframe.setAttribute("data-src", src);
 
-            consoleLog("EPUB doc iframe base URI:");
-            consoleLog(iframe.baseURI);
+            console.log("EPUB doc iframe base URI:");
+            console.log(iframe.baseURI);
             iframe.setAttribute("data-baseUri", iframe.baseURI);
 
 
             var loadedDocumentUri = new URI(src).absoluteTo(iframe.baseURI).search('').hash('').toString();
 
-            consoleLog("EPUB doc iframe LOAD URI:");
-            consoleLog(loadedDocumentUri);
+            console.log("EPUB doc iframe LOAD URI:");
+            console.log(loadedDocumentUri);
             iframe.setAttribute("data-loadUri", loadedDocumentUri);
 
             var shouldConstructDomProgrammatically = getCurrentResourceFetcher().shouldConstructDomProgrammatically();
             if (shouldConstructDomProgrammatically) {
 
-                consoleLog("shouldConstructDomProgrammatically...");
+                console.log("shouldConstructDomProgrammatically...");
 
                 getCurrentResourceFetcher().fetchContentDocument(attachedData, loadedDocumentUri,
                     function (resolvedContentDocumentDom) {
@@ -165,7 +165,7 @@ define(['URIjs', 'readium_shared_js/views/iframe_loader', 'underscore', './disco
 
                 // $('iframe', doc).each(function(i, child_iframe){
                 //     console.debug(child_iframe);
-                //     consoleLog(child_iframe.attr("data-src"));
+                //     console.log(child_iframe.attr("data-src"));
                 // });
 
                 if (iframe.contentWindow.frames) {
@@ -173,9 +173,9 @@ define(['URIjs', 'readium_shared_js/views/iframe_loader', 'underscore', './disco
                         var child_iframe = iframe.contentWindow.frames[i];
                         // console.debug(child_iframe);
 
-                        // consoleLog(child_iframe.frameElement.baseURI);
+                        // console.log(child_iframe.frameElement.baseURI);
 
-                        // consoleLog(child_iframe.location);
+                        // console.log(child_iframe.location);
 
                         var childSrc = undefined;
 
@@ -183,14 +183,14 @@ define(['URIjs', 'readium_shared_js/views/iframe_loader', 'underscore', './disco
                             childSrc = child_iframe.frameElement.getAttribute("data-src");
                         } catch(err) {
                             // HTTP(S) cross-origin access?
-                            consoleError(err);
+                            console.error(err);
                             continue;
                         }
-                        // consoleLog(childSrc);
+                        // console.log(childSrc);
 
                         if (!childSrc) {
                             if (child_iframe.frameElement.localName == "iframe") {
-                                consoleError("IFRAME data-src missing?!");
+                                console.error("IFRAME data-src missing?!");
                             }
                             continue;
                         }
@@ -201,17 +201,17 @@ define(['URIjs', 'readium_shared_js/views/iframe_loader', 'underscore', './disco
                         var publicationFetcher = getCurrentResourceFetcher();
 
                         var contentDocumentPathRelativeToBase = publicationFetcher.convertPathRelativeToPackageToRelativeToBase(contentDocumentPathRelativeToPackage);
-                        // consoleLog("contentDocumentPathRelativeToBase: " + contentDocumentPathRelativeToBase);
+                        // console.log("contentDocumentPathRelativeToBase: " + contentDocumentPathRelativeToBase);
 
                         var refAttrOrigVal_RelativeToBase = (new URI(childSrc)).absoluteTo(contentDocumentPathRelativeToBase).toString();
-                        // consoleLog("refAttrOrigVal_RelativeToBase: " + refAttrOrigVal_RelativeToBase);
+                        // console.log("refAttrOrigVal_RelativeToBase: " + refAttrOrigVal_RelativeToBase);
 
                         var packageFullPath = publicationFetcher.getPackageFullPathRelativeToBase();
-                        // consoleLog("packageFullPath: " + packageFullPath);
+                        // console.log("packageFullPath: " + packageFullPath);
 
 
                         var refAttrOrigVal_RelativeToPackage = (new URI("/"+refAttrOrigVal_RelativeToBase)).relativeTo("/"+packageFullPath).toString();
-                        // consoleLog("refAttrOrigVal_RelativeToPackage: " + refAttrOrigVal_RelativeToPackage);
+                        // console.log("refAttrOrigVal_RelativeToPackage: " + refAttrOrigVal_RelativeToPackage);
 
                         var mimetype = ContentTypeDiscovery.identifyContentTypeFromFileName(refAttrOrigVal_RelativeToPackage);
 
@@ -220,7 +220,7 @@ define(['URIjs', 'readium_shared_js/views/iframe_loader', 'underscore', './disco
                             child_iframe.frameElement,
                             childSrc,
                             function() {
-                                consoleLog("CHILD IFRAME LOADED.");
+                                console.log("CHILD IFRAME LOADED.");
                             },
                             self,
                             {
@@ -235,7 +235,7 @@ define(['URIjs', 'readium_shared_js/views/iframe_loader', 'underscore', './disco
                 }
 
                 $('svg', doc).on("load", function(){
-                    consoleLog('SVG loaded');
+                    console.log('SVG loaded');
                 });
 
                 self.updateIframeEvents(iframe);
@@ -243,7 +243,7 @@ define(['URIjs', 'readium_shared_js/views/iframe_loader', 'underscore', './disco
                 var mathJax = iframe.contentWindow.MathJax;
                 if (mathJax) {
 
-                    consoleLog("MathJax VERSION: " + mathJax.cdnVersion + " // " + mathJax.fileversion + " // " + mathJax.version);
+                    console.log("MathJax VERSION: " + mathJax.cdnVersion + " // " + mathJax.fileversion + " // " + mathJax.version);
 
                     var useFontCache = true; // default in MathJax
 
@@ -272,7 +272,7 @@ define(['URIjs', 'readium_shared_js/views/iframe_loader', 'underscore', './disco
                     try {
                         mathJax.Hub.Queue(mathJaxCallback);
                     } catch (err) {
-                        consoleError("MathJax fail!");
+                        console.error("MathJax fail!");
                         callback();
                     }
 
@@ -307,9 +307,9 @@ define(['URIjs', 'readium_shared_js/views/iframe_loader', 'underscore', './disco
                     callback(result);
                 },
                 error: function (xhr, status, errorThrown) {
-                    consoleError('Error when AJAX fetching ' + path);
-                    consoleError(status);
-                    consoleError(errorThrown);
+                    console.error('Error when AJAX fetching ' + path);
+                    console.error(status);
+                    console.error(errorThrown);
                     callback();
                 }
             });

@@ -58,8 +58,8 @@ define([
                 //sourceParts.pop(); //remove source file name
                 var baseHref = sourceParts.join("/"); // + "/";
 
-                consoleLog("EPUB doc base href:");
-                consoleLog(baseHref);
+                console.log("EPUB doc base href:");
+                console.log(baseHref);
                 var base = "<base href=\"" + encodeURI(escapeMarkupEntitiesInUrl(baseHref)) + "\"/>";
 
                 var scripts = "<script type=\"text/javascript\">(" + injectedScript.toString() + ")()<\/script>";
@@ -210,10 +210,10 @@ define([
                                                 StorageManager.saveBookshelf("db://epub_library.json",
                                                     bookshelf,
                                                     () => { },
-                                                    consoleError);
+                                                    console.error);
                                             }
                                         },
-                                        consoleError);
+                                        console.error);
                                 });
 
                                 finishOpeningBook();
@@ -246,8 +246,8 @@ define([
                     try {
                         ebookURL = new URI(ebookURL).absoluteTo(thisRootUrl).toString();
                     } catch (err) {
-                        consoleError(err);
-                        consoleLog(ebookURL);
+                        console.error(err);
+                        console.log(ebookURL);
                     }
 
                     if (ebookURL.endsWith(".epub")) {
@@ -327,8 +327,8 @@ define([
                     try {
                         ebookURL = new URI(ebookURL).absoluteTo(thisRootUrl).toString();
                     } catch (err) {
-                        consoleError(err);
-                        consoleLog(ebookURL);
+                        console.error(err);
+                        console.log(ebookURL);
                     }
 
                     // We don't use URI.is("absolute") here, as we really need HTTP(S) (excludes e.g. "data:" URLs)
@@ -350,14 +350,14 @@ define([
                                     if (allResponseHeaders) {
                                         allResponseHeaders = allResponseHeaders.toLowerCase();
                                     } else allResponseHeaders = '';
-                                    //consoleLog(allResponseHeaders);
+                                    //console.log(allResponseHeaders);
                                 }
 
                                 if (allResponseHeaders.indexOf("content-type") >= 0) {
                                     contentType = xhr.getResponseHeader("Content-Type") || xhr.getResponseHeader("content-type");
                                     if (!contentType) contentType = undefined;
 
-                                    consoleLog("CONTENT-TYPE: " + ebookURL + " ==> " + contentType);
+                                    console.log("CONTENT-TYPE: " + ebookURL + " ==> " + contentType);
                                 }
 
                                 var responseURL = xhr.responseURL;
@@ -368,7 +368,7 @@ define([
                                 }
 
                                 if (responseURL && responseURL !== ebookURL) {
-                                    consoleLog("REDIRECT: " + ebookURL + " ==> " + responseURL);
+                                    console.log("REDIRECT: " + ebookURL + " ==> " + responseURL);
 
                                     ebookURL = responseURL;
                                 }

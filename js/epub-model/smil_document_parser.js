@@ -64,7 +64,7 @@ define(['underscore'], function (_) {
                 if (defaultValue !== undefined) {
                     toItem[destProperty] = defaultValue;
                 } else {
-                    consoleLog("Required property " + property + " not found in smil node " + fromNode.nodeName);
+                    console.log("Required property " + property + " not found in smil node " + fromNode.nodeName);
                 }
             }
         };
@@ -177,7 +177,7 @@ define(['underscore'], function (_) {
                     var manifestItemSMIL = packageDocument.manifest.getManifestItemByIdref(spineItem.media_overlay_id);
 
                     if (!manifestItemSMIL) {
-                        consoleError("Cannot find SMIL manifest item for spine/manifest item?! " + spineItem.media_overlay_id);
+                        console.error("Cannot find SMIL manifest item for spine/manifest item?! " + spineItem.media_overlay_id);
                         continue;
                     }
                     //ASSERT manifestItemSMIL.media_type === "application/smil+xml"
@@ -196,8 +196,8 @@ define(['underscore'], function (_) {
                         allFakeSmil = false;
                         myDeferred.resolve();
                     }, function(myDeferred, parseError) {
-                        consoleLog('Error when parsing SMIL manifest item ' + manifestItemSMIL.href + ':');
-                        consoleLog(parseError);
+                        console.log('Error when parsing SMIL manifest item ' + manifestItemSMIL.href + ':');
+                        console.log(parseError);
                         myDeferred.resolve();
                     });
                 } else {
