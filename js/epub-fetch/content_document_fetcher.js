@@ -153,8 +153,10 @@ define(
         		    } else {
         			    $(resolvedElem).attr('data-epubZipOrigHref', refAttrOrigVal);
         			    $(resolvedElem).attr(refAttr, newResourceUrl);
-        		    }
-                    window.mediaCacheMap[newResourceUrl] = refAttrOrigVal;
+                    }
+                    
+                    if (window.mediaCacheMap)
+                        window.mediaCacheMap[newResourceUrl] = refAttrOrigVal;
                 }
 
                 var refAttrUri = new URI(refAttrOrigVal);
