@@ -206,7 +206,8 @@ define([
                                                     rootUrl: ebookURL,
                                                     coverPath: metadata.cover_href,
                                                     coverHref: openBookData.rootUrl + "/" + metadata.cover_href,
-                                                    pubdate: metadata.pubdate
+                                                    pubdate: metadata.pubdate,
+                                                    duration: metadata.duration
                                                 });
                                                 StorageManager.saveBookshelf("db://epub_library.json",
                                                     bookshelf,

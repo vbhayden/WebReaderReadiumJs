@@ -228,6 +228,7 @@ define(['underscore', '../epub-fetch/markup_parser', 'URIjs', './package_documen
             metadata.modified_date = getMetaElemPropertyText(metadataElem, "dcterms:modified");
             metadata.ncx = spineElem.getAttribute("toc") ? spineElem.getAttribute("toc") : "";
             metadata.pubdate = getElemText(metadataElem, "date");
+            metadata.duration = getMetaElemPropertyText(metadataElem, "duration");
             metadata.publisher = getElemText(metadataElem, "publisher");
             metadata.rights = getElemText(metadataElem, "rights");
             metadata.title = getElemText(metadataElem, "title");
