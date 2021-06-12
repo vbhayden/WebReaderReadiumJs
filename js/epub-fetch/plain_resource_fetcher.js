@@ -89,6 +89,8 @@ define(['URIjs', './discover_content_type'], function (URI, ContentTypeDiscovery
                     fetchCallback(result);
                 },
                 error: function (xhr, status, errorThrown) {
+                    if (xhr.status === 507)
+                        alert('Insufficient library bandwidth. Contact your site administrator.')
                     onerror(new Error(errorThrown));
                 }
             });

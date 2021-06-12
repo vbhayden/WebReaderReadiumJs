@@ -307,6 +307,8 @@ define(['URIjs', 'readium_shared_js/views/iframe_loader', 'underscore', './disco
                     callback(result);
                 },
                 error: function (xhr, status, errorThrown) {
+                    if (xhr.status === 507)
+                        alert('Insufficient library bandwidth. Contact your site administrator.')
                     console.error('Error when AJAX fetching ' + path);
                     console.error(status);
                     console.error(errorThrown);
