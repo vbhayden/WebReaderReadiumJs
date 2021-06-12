@@ -373,6 +373,8 @@ define(['URIjs', './markup_parser', './plain_resource_fetcher', './zip_resource_
                               fetchCallback(result);
                           },
                           error: function (xhr, status, errorThrown) {
+                              if (xhr.status === 507)
+                                alert('Insufficient library bandwidth. Contact your site administrator.')
                               onerror(new Error(errorThrown));
                           }
                     });
